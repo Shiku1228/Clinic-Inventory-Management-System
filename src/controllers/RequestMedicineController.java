@@ -87,10 +87,10 @@ public class RequestMedicineController implements Initializable {
 // ===============================
     //Popup Gallery for Medicines 
     private void loadSampleMedicines() {
-        medicines.add(new Medicine("Biogesic", "For headache and fever", "/resource/biogesic.jpg"));
-        medicines.add(new Medicine("Neozep", "For colds and flu", "/resource/neozep.jpg"));
-        medicines.add(new Medicine("Alaxan Fr", "Muscle Pain reliever", "/resource/alaxan.jpg"));
-        medicines.add(new Medicine("Decolgen", "Sinus, allergies, & flu relief", "/resource/decolgen.jpg"));
+        medicines.add(new Medicine("Biogesic", "For headache and fever", "/resource/medImages/biogesic.jpg"));
+        medicines.add(new Medicine("Neozep", "For colds and flu", "/resource/medImages/neozep.jpg"));
+        medicines.add(new Medicine("Alaxan Fr", "Muscle Pain reliever", "/resource/medImages/alaxan.jpg"));
+        medicines.add(new Medicine("Decolgen", "Sinus, allergies, & flu relief", "/resource/medImages/decolgen.jpg"));
     }
 
     private void buildMedicinePopup() {

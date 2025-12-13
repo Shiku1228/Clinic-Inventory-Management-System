@@ -54,7 +54,7 @@
                             <children>
                                 <ImageView fitHeight="56.0" fitWidth="56.0" preserveRatio="true">
                                     <image>
-                                        <Image url="@../resource/medicine.png" />
+                                        <Image url="@../resource/images_icons/medicine.png" />
                                     </image>
                                 </ImageView>
                                 <Label fx:id="totalMedicinesLabel" styleClass="stat-value" text="142">
@@ -73,7 +73,7 @@
                             <children>
                                 <ImageView fitHeight="56.0" fitWidth="60.0" preserveRatio="true">
                                     <image>
-                                        <Image url="@../resource/warning.png" />
+                                        <Image url="@../resource/images_icons/warning.png" />
                                     </image>
                                 </ImageView>
                                 <Label fx:id="lowSupplyLabel" styleClass="stat-value" text="5">
@@ -92,7 +92,7 @@
                             <children>
                                 <ImageView fitHeight="56.0" fitWidth="67.0" preserveRatio="true">
                                     <image>
-                                        <Image url="@../resource/users.png" />
+                                        <Image url="@../resource/images_icons/users.png" />
                                     </image>
                                 </ImageView>
                                 <Label fx:id="totalUsersLabel" styleClass="stat-value" text="7">
@@ -111,7 +111,7 @@
                             <children>
                                 <ImageView fitHeight="56.0" fitWidth="56.0" preserveRatio="true">
                                     <image>
-                                        <Image url="@../resource/records.png" />
+                                        <Image url="@../resource/images_icons/records.png" />
                                     </image>
                                 </ImageView>
                                 <Label fx:id="requestsTodayLabel" styleClass="stat-value" text="12">
@@ -130,7 +130,7 @@
                             <children>
                                 <ImageView fitHeight="56.0" fitWidth="56.0" preserveRatio="true">
                                     <image>
-                                        <Image url="@../resource/expiration.png" />
+                                        <Image url="@../resource/images_icons/expiration.png" />
                                     </image>
                                 </ImageView>
                                 <Label fx:id="expiredItemsLabel" styleClass="stat-value" text="3">

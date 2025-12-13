@@ -216,7 +216,7 @@ public class ManageItemsController implements Initializable {
             card.getStyleClass().add("gallery-card");
 
             // IMAGE
-            String imagePath = "src/main/resources/resource/medicine.png"; // default
+            String imagePath = "src/main/resources/resource/images_icons/medicine.png"; // default
             ImageView img = new ImageView(new Image("file:" + imagePath));
             img.getStyleClass().add("item-image");
 

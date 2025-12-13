@@ -12,6 +12,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+
 
 <AnchorPane prefHeight="600" prefWidth="900" stylesheets="@../resource/manageusers.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ManageUsersController">
 
@@ -61,17 +64,28 @@
         <!-- SELECTED USER CARD -->
         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="user-profile-card">
 
-            <ImageView fx:id="userAvatar" fitHeight="90" fitWidth="90" styleClass="user-avatar">
-                <image>
-                    <Image url="@../resource/user.png" />
-                </image>
-            </ImageView>
+            <!-- AVATAR WRAPPER WITH CIRCULAR BORDER -->
+            <StackPane fx:id="avatarWrapper" prefWidth="120" prefHeight="120">
+                <!-- BORDER CIRCLE (default color, can change dynamically in controller) -->
+                <Circle fx:id="avatarBorder" radius="60" fill="TRANSPARENT" stroke="#FFD700" strokeWidth="4" />
+
+                <!-- AVATAR IMAGE -->
+                <ImageView fx:id="userAvatar"
+                           fitWidth="120"
+                           fitHeight="120"
+                           preserveRatio="false"
+                           smooth="true">
+                    <clip>
+                        <Circle radius="60" />
+                    </clip>
+                </ImageView>
+            </StackPane>
 
             <VBox spacing="5">
-                <Label fx:id="userName" styleClass="user-name" text="Director Itoshi Buki" />
-                <Label fx:id="userClinic" styleClass="user-info" text="Clinic Inventory Management System" />
-                <Label fx:id="userEmail" styleClass="user-info" text="itoshi@email.com" />
-                <Label fx:id="userPhone" styleClass="user-info" text="0994329314" />
+                <Label fx:id="userName" styleClass="user-name" text="" />
+                <Label fx:id="userClinic" styleClass="user-info" text="" />
+                <Label fx:id="userEmail" styleClass="user-info" text="" />
+                <Label fx:id="userPhone" styleClass="user-info" text="" />
             </VBox>
 
             <Region prefHeight="90.0" prefWidth="277.0" HBox.hgrow="ALWAYS" />
@@ -82,6 +96,7 @@
             </HBox>
 
         </HBox>
+
 
         <!-- USERS TABLE -->
         <VBox spacing="10" styleClass="table-container">
@@ -103,8 +118,8 @@
         </VBox>
 
     </VBox>
-   <opaqueInsets>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-   </opaqueInsets>
+    <opaqueInsets>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </opaqueInsets>
 
 </AnchorPane>

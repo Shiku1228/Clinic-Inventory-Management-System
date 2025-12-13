@@ -12,6 +12,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.shape.Circle;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import models.Users;
 
 public class ManageUsersController implements Initializable {
@@ -31,6 +36,10 @@ public class ManageUsersController implements Initializable {
     private TextField searchField;
 
     //Selected User Card
+    @FXML
+    private StackPane avatarWrapper;
+    @FXML
+    private Circle avatarBorder;
     @FXML
     private ImageView userAvatar;
     @FXML
@@ -137,11 +146,13 @@ public class ManageUsersController implements Initializable {
 
         //Sample data items
         userList.addAll(
-                new Users("1", "Renz Latangga", "Director", "Active"),
-                new Users("2", "John Daniel Marañan", "Doctor", "Active"),
-                new Users("3", "Krish Talino", "Nurse", "Active"),
-                new Users("4", "Merdin Harid", "Admin", "Active")
+                new Users("1", "Renz Latangga", "Director", "Active", "/resource/avatars/renz_pfp.png"),
+                new Users("2", "John Daniel Marañan", "Doctor", "Active", "/resource/avatars/janjan_pfp.png"),
+                new Users("3", "John Christian Abelgas", "Nurse", "Active", "/resource/avatars/upaw_pfp.png"),
+                new Users("4", "Merdin Harid", "Admin", "Active", "/resource/avatars/merdin_pfp.png"),
+                new Users("5", "Krish Talino", "Admin", "Active", "/resource/avatars/krish_pfp.png")
         );
+
         usersTable.setItems(userList);
 
         usersTable.getSelectionModel().selectedItemProperty().addListener(
@@ -177,15 +188,77 @@ public class ManageUsersController implements Initializable {
     }
 
     private void showSelectedUser(Users user) {
+        // Update user info
         userName.setText(user.getName());
-        userClinic.setText("Clinic Inventory Management System"); //static for now
-        userEmail.setText(user.getName().toLowerCase().replace(" ", "") + "@email.com"); // dummy email
-        userPhone.setText("09999999999999");
+        userClinic.setText("Clinic Inventory Management System");
+        userEmail.setText(user.getName().toLowerCase().replace(" ", "") + "@email.com");
+        userPhone.setText("09999999999");
 
-        /**
-         * Avatar is static: you can replace based ont he role that you want.
-         * /Example: userAvatar.setImage.(new Image("/path/to/image.png)*
-         */
+        // Load the user's own avatar image from their userList
+        Image avatar;
+        try {
+            avatar = new Image(getClass().getResourceAsStream(user.getAvatarUrl()));
+        } catch (Exception e) {
+            // Fallback if image not found
+            avatar = new Image(getClass().getResourceAsStream("/resource/avatars/user.png"));
+        }
+
+        // Determine border color based on role
+        Color borderColor;
+        switch (user.getRole().toLowerCase()) {
+            case "director":
+                borderColor = Color.web("#FFD700"); // Gold
+                break;
+            case "doctor":
+                borderColor = Color.web("#4CAF50"); // Green
+                break;
+            case "nurse":
+                borderColor = Color.web("#2196F3"); // Blue
+                break;
+            case "admin":
+                borderColor = Color.web("#9C27B0"); // Purple
+                break;
+            default:
+                borderColor = Color.GRAY;
+        }
+
+        // Apply circular avatar with role-based border
+        applyCircularAvatar(avatar, borderColor);
+    }
+
+    //for making the avatar circular
+    private void applyCircularAvatar(Image image, Color borderColor) {
+        double size = 120;
+        double radius = size / 2;
+
+        // Center crop for square
+        double min = Math.min(image.getWidth(), image.getHeight());
+        Rectangle2D viewport = new Rectangle2D(
+                (image.getWidth() - min) / 2,
+                (image.getHeight() - min) / 2,
+                min,
+                min
+        );
+
+        userAvatar.setImage(image);
+        userAvatar.setViewport(viewport);
+        userAvatar.setFitWidth(size);
+        userAvatar.setFitHeight(size);
+        userAvatar.setPreserveRatio(false);
+
+        // Circular clip
+        Circle clip = new Circle(radius, radius, radius);
+        userAvatar.setClip(clip);
+
+        // Role-based border
+        Circle border = new Circle(radius, radius, radius);
+        border.setFill(Color.TRANSPARENT);
+        border.setStroke(borderColor);
+        border.setStrokeWidth(4);
+
+        // Wrap avatar and border in the StackPane
+        StackPane wrapper = (StackPane) userAvatar.getParent();
+        wrapper.getChildren().setAll(border, userAvatar);
     }
 
     private void setupSearch() {

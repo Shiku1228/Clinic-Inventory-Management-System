@@ -28,7 +28,7 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Load logo
-        Image logoImage = new Image(getClass().getResourceAsStream("/resource/rmmcLogo.png"));
+        Image logoImage = new Image(getClass().getResourceAsStream("/resource/images_icons/rmmcLogo.png"));
         imageLogo.setImage(logoImage);
 
         // Load default dashboard content

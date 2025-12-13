@@ -28,7 +28,7 @@
                     <children>
                         <ImageView fx:id="imageLogo" fitHeight="125.0" fitWidth="117.0" preserveRatio="true" styleClass="clinic-logo">
                             <image>
-                                <Image url="@../resource/rmmcLogo.png" />
+                                <Image url="@../resource/images_icons/rmmcLogo.png" />
                             </image>
                      <effect>
                         <Glow level="0.14" />
