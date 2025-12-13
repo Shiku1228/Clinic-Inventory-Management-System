@@ -1,91 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="600"
-            prefWidth="900"
-            stylesheets="@../resource/manageusers.css"
-            xmlns="http://javafx.com/javafx/24.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controllers.ManageUsersController">
+<AnchorPane prefHeight="600" prefWidth="900" stylesheets="@../resource/manageusers.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ManageUsersController">
 
-    <VBox spacing="20" styleClass="manage-users-root"
-          AnchorPane.topAnchor="20"
-          AnchorPane.bottomAnchor="20"
-          AnchorPane.leftAnchor="20"
-          AnchorPane.rightAnchor="20">
+    <VBox spacing="20" styleClass="manage-users-root" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
 
         <!-- TITLE -->
         <VBox spacing="5">
-            <Label text="Manage Users" styleClass="page-title"/>
-            <Label text="Manage the registered users in this interface."
-                   styleClass="page-subtitle"/>
+            <Label styleClass="page-title" text="Manage Users" />
+            <Label styleClass="page-subtitle" text="Manage the registered users in this interface." />
         </VBox>
 
         <!-- SUMMARY CARDS -->
-        <HBox spacing="15" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT" spacing="15">
 
-            <VBox fx:id="directorCard" prefWidth="180"
-                  alignment="CENTER" styleClass="summary-card">
-                <Label text="1" styleClass="summary-number"/>
-                <Label text="Registered Director" styleClass="summary-label"/>
+            <VBox fx:id="directorCard" alignment="CENTER" prefWidth="180" styleClass="summary-card">
+                <Label styleClass="summary-number" text="1" />
+                <Label styleClass="summary-label" text="Registered Director" />
             </VBox>
 
-            <VBox fx:id="doctorCard" prefWidth="180"
-                  alignment="CENTER" styleClass="summary-card">
-                <Label text="3" styleClass="summary-number"/>
-                <Label text="Registered Doctor" styleClass="summary-label"/>
+            <VBox fx:id="doctorCard" alignment="CENTER" prefWidth="180" styleClass="summary-card">
+                <Label styleClass="summary-number" text="3" />
+                <Label styleClass="summary-label" text="Registered Doctor" />
             </VBox>
 
-            <VBox fx:id="nurseCard" prefWidth="180"
-                  alignment="CENTER" styleClass="summary-card">
-                <Label text="1" styleClass="summary-number"/>
-                <Label text="Registered Nurse" styleClass="summary-label"/>
+            <VBox fx:id="nurseCard" alignment="CENTER" prefWidth="180" styleClass="summary-card">
+                <Label styleClass="summary-number" text="1" />
+                <Label styleClass="summary-label" text="Registered Nurse" />
             </VBox>
 
-            <VBox fx:id="adminCard" prefWidth="180"
-                  alignment="CENTER" styleClass="summary-card">
-                <Label text="2" styleClass="summary-number"/>
-                <Label text="Registered Admin" styleClass="summary-label"/>
+            <VBox fx:id="adminCard" alignment="CENTER" prefWidth="180" styleClass="summary-card">
+                <Label styleClass="summary-number" text="2" />
+                <Label styleClass="summary-label" text="Registered Admin" />
             </VBox>
 
         </HBox>
 
         <!-- SEARCH BAR -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="search-bar">
             <ImageView fitHeight="18" fitWidth="18">
                 <image>
-                    <Image url="@../resource/search.png"/>
+                    <Image url="@../resource/search.png" />
                 </image>
             </ImageView>
-            <TextField fx:id="searchField" promptText="Search user..."/>
+            <TextField fx:id="searchField" promptText="Search user..." />
         </HBox>
 
         <!-- SELECTED USER CARD -->
-        <HBox spacing="20" alignment="CENTER_LEFT" styleClass="user-profile-card">
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="user-profile-card">
 
-            <ImageView fitHeight="90" fitWidth="90" styleClass="user-avatar">
+            <ImageView fx:id="userAvatar" fitHeight="90" fitWidth="90" styleClass="user-avatar">
                 <image>
-                    <Image url="@../resource/user.png"/>
+                    <Image url="@../resource/user.png" />
                 </image>
             </ImageView>
 
             <VBox spacing="5">
-                <Label text="Director Itoshi Buki" styleClass="user-name"/>
-                <Label text="Clinic Inventory Management System" styleClass="user-info"/>
-                <Label text="itoshi@email.com" styleClass="user-info"/>
-                <Label text="0994329314" styleClass="user-info"/>
+                <Label fx:id="userName" styleClass="user-name" text="Director Itoshi Buki" />
+                <Label fx:id="userClinic" styleClass="user-info" text="Clinic Inventory Management System" />
+                <Label fx:id="userEmail" styleClass="user-info" text="itoshi@email.com" />
+                <Label fx:id="userPhone" styleClass="user-info" text="0994329314" />
             </VBox>
 
-            <Region HBox.hgrow="ALWAYS"/>
+            <Region prefHeight="90.0" prefWidth="277.0" HBox.hgrow="ALWAYS" />
 
             <HBox spacing="10">
-                <Button text="Edit" styleClass="edit-btn"/>
-                <Button text="Deactivate" styleClass="delete-btn"/>
+                <Button fx:id="editButton" styleClass="edit-btn" text="Edit" />
+                <Button fx:id="deactivateButton" styleClass="delete-btn" text="Deactivate" />
             </HBox>
 
         </HBox>
@@ -95,20 +88,23 @@
 
             <TableView fx:id="usersTable" prefHeight="250">
                 <columns>
-                    <TableColumn text="User ID"/>
-                    <TableColumn text="Name"/>
-                    <TableColumn text="Role"/>
-                    <TableColumn text="Status"/>
-                    <TableColumn text="Actions"/>
+                    <TableColumn text="User ID" />
+                    <TableColumn text="Name" />
+                    <TableColumn text="Role" />
+                    <TableColumn text="Status" />
+                    <TableColumn text="Actions" />
                 </columns>
             </TableView>
 
             <HBox alignment="CENTER_RIGHT">
-                <Button text="Add User" styleClass="primary-btn"/>
+                <Button fx:id="addUserButton" styleClass="primary-btn" text="Add User" />
             </HBox>
 
         </VBox>
 
     </VBox>
+   <opaqueInsets>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </opaqueInsets>
 
 </AnchorPane>
