@@ -1,0 +1,163 @@
+/* =====================
+   ROOT
+   ===================== */
+.manage-users-root {
+    -fx-background-color: #F1F2F4;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* =====================
+   PAGE TITLE
+   ===================== */
+.page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #141652;
+}
+
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+/* =====================
+   SUMMARY CARDS
+   ===================== */
+.summary-card {
+    -fx-background-color: linear-gradient(to bottom right, #141652, #1E1F70);
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 6, 0, 0, 3);
+}
+
+.summary-card:hover {
+    -fx-border-color: #FFEB50;
+    -fx-border-width: 3;
+    -fx-border-radius: 12;
+}
+
+.summary-number {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.summary-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #E0E0E0;
+}
+
+/* =====================
+   SEARCH BAR
+   ===================== */
+.search-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-padding: 8 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
+}
+
+.search-bar TextField {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-prompt-text-fill: #888888;
+    -fx-font-size: 13px;
+}
+
+/* =====================
+   USER PROFILE CARD
+   ===================== */
+.user-profile-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 3);
+}
+
+.user-avatar {
+    -fx-background-radius: 50%;
+}
+
+.user-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #141652;
+}
+
+.user-info {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+/* =====================
+   TABLE
+   ===================== */
+.table-container {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 6, 0, 0, 3);
+}
+
+.table-view {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #141652;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #FFEB50;
+}
+
+/* =====================
+   BUTTONS
+   ===================== */
+.primary-btn {
+    -fx-background-color: #141652;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 6 18;
+    -fx-cursor: hand;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #1E1F70;
+}
+
+.edit-btn {
+    -fx-background-color: #141652;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-padding: 5 14;
+    -fx-cursor: hand;
+}
+
+.delete-btn {
+    -fx-background-color: #D32F2F;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-padding: 5 14;
+    -fx-cursor: hand;
+}
+
+.delete-btn:hover {
+    -fx-background-color: #B71C1C;
+}

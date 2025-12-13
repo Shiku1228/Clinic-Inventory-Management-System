@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600"
+            prefWidth="900"
+            stylesheets="@../resource/manageusers.css"
+            xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.ManageUsersController">
+
+    <VBox spacing="20" styleClass="manage-users-root"
+          AnchorPane.topAnchor="20"
+          AnchorPane.bottomAnchor="20"
+          AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20">
+
+        <!-- TITLE -->
+        <VBox spacing="5">
+            <Label text="Manage Users" styleClass="page-title"/>
+            <Label text="Manage the registered users in this interface."
+                   styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- SUMMARY CARDS -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+
+            <VBox fx:id="directorCard" prefWidth="180"
+                  alignment="CENTER" styleClass="summary-card">
+                <Label text="1" styleClass="summary-number"/>
+                <Label text="Registered Director" styleClass="summary-label"/>
+            </VBox>
+
+            <VBox fx:id="doctorCard" prefWidth="180"
+                  alignment="CENTER" styleClass="summary-card">
+                <Label text="3" styleClass="summary-number"/>
+                <Label text="Registered Doctor" styleClass="summary-label"/>
+            </VBox>
+
+            <VBox fx:id="nurseCard" prefWidth="180"
+                  alignment="CENTER" styleClass="summary-card">
+                <Label text="1" styleClass="summary-number"/>
+                <Label text="Registered Nurse" styleClass="summary-label"/>
+            </VBox>
+
+            <VBox fx:id="adminCard" prefWidth="180"
+                  alignment="CENTER" styleClass="summary-card">
+                <Label text="2" styleClass="summary-number"/>
+                <Label text="Registered Admin" styleClass="summary-label"/>
+            </VBox>
+
+        </HBox>
+
+        <!-- SEARCH BAR -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
+            <ImageView fitHeight="18" fitWidth="18">
+                <image>
+                    <Image url="@../resource/search.png"/>
+                </image>
+            </ImageView>
+            <TextField fx:id="searchField" promptText="Search user..."/>
+        </HBox>
+
+        <!-- SELECTED USER CARD -->
+        <HBox spacing="20" alignment="CENTER_LEFT" styleClass="user-profile-card">
+
+            <ImageView fitHeight="90" fitWidth="90" styleClass="user-avatar">
+                <image>
+                    <Image url="@../resource/user.png"/>
+                </image>
+            </ImageView>
+
+            <VBox spacing="5">
+                <Label text="Director Itoshi Buki" styleClass="user-name"/>
+                <Label text="Clinic Inventory Management System" styleClass="user-info"/>
+                <Label text="itoshi@email.com" styleClass="user-info"/>
+                <Label text="0994329314" styleClass="user-info"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox spacing="10">
+                <Button text="Edit" styleClass="edit-btn"/>
+                <Button text="Deactivate" styleClass="delete-btn"/>
+            </HBox>
+
+        </HBox>
+
+        <!-- USERS TABLE -->
+        <VBox spacing="10" styleClass="table-container">
+
+            <TableView fx:id="usersTable" prefHeight="250">
+                <columns>
+                    <TableColumn text="User ID"/>
+                    <TableColumn text="Name"/>
+                    <TableColumn text="Role"/>
+                    <TableColumn text="Status"/>
+                    <TableColumn text="Actions"/>
+                </columns>
+            </TableView>
+
+            <HBox alignment="CENTER_RIGHT">
+                <Button text="Add User" styleClass="primary-btn"/>
+            </HBox>
+
+        </VBox>
+
+    </VBox>
+
+</AnchorPane>

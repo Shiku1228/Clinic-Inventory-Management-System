@@ -1,0 +1,99 @@
+/* ===============================
+   GLOBAL RESET / BASE
+=============================== */
+.root, .mainFxmlClass {
+    -fx-font-family: "Poppins";
+    -fx-background-color: #FFFFFF;
+}
+
+.dashboard-main-content {
+    -fx-background-color: #FFFFFF;
+}
+
+/* ===============================
+   SIDEBAR
+=============================== */
+.sidebar-pane {
+    -fx-background-color: #141652;
+    -fx-padding: 25 20 25 20;
+    -fx-spacing: 12;
+    -fx-alignment: top-center;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0, 0, 0);
+}
+
+.clinic-logo {
+    -fx-padding: 0 0 0 0;
+}
+
+.sidebar-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: #ffffff;
+    -fx-text-alignment: center;
+    -fx-font-weight:bold;
+}
+
+.sidebar-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #A69C0D;
+    -fx-font-style: italic;
+}
+
+.sidebar-separator {
+    -fx-background-color: #1a4776;
+    -fx-pref-height: 2px;
+}
+
+/* ===============================
+   SIDEBAR BUTTONS
+=============================== */
+.nav-button {
+    -fx-background-color: #33357A;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-padding: 10 15;
+    -fx-alignment: center;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-weight: 500;
+}
+
+.nav-button:hover {
+    -fx-background-color: #0f0f45; /* The new dark blue background */
+    -fx-text-fill: #FFFFFF;       /* Might need to change text color for contrast */
+    
+    /* THE GLOW EFFECT */
+    -fx-effect: dropshadow(
+        three-pass-box, /* The shadow type */
+        #212170,        /* The glow color (matches the background hover color) */
+        15,             /* The blur radius (higher number = bigger glow) */
+        0.5,            /* The spread (0.0 for uniform glow) */
+        0,              /* Horizontal offset */
+        0               /* Vertical offset */
+    );
+}
+
+.nav-button:selected {
+    -fx-background-color: #FFEB50; /* yellow highlight */
+    -fx-text-fill: #000000;
+}
+
+.logout-button {
+    -fx-background-color: #CD2626;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-weight: 500;
+}
+
+.logout-button:hover {
+    -fx-background-color: #b23434;
+}
+
+.menu-label {
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 0 0;
+}
