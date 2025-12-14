@@ -46,7 +46,7 @@
                         <Button fx:id="btnRequestMedicine" alignment="CENTER" onAction="#handleRequestMedicine" prefHeight="40.0" prefWidth="264.0" styleClass="nav-button" text="Request Medicine" />
                         <Button fx:id="btnManageItems" alignment="CENTER" contentDisplay="CENTER" onAction="#handleManageItems" prefHeight="40.0" prefWidth="331.0" styleClass="nav-button" text="Manage Items" />
                         <Button fx:id="btnManageUsers" alignment="CENTER" onAction="#handleManageUsers" prefHeight="40.0" prefWidth="332.0" styleClass="nav-button" text="Manage Users" />
-                  <Button fx:id="btnManageUsers1" alignment="CENTER" onAction="#handleManageUsers" prefHeight="40.0" prefWidth="367.0" styleClass="nav-button" text="Transactions" />
+                        <Button fx:id="btnTransactions" alignment="CENTER" onAction="#handleTransactions" prefHeight="40.0" prefWidth="367.0" styleClass="nav-button" text="Transactions" />
 
                         <Region VBox.vgrow="ALWAYS" />
 

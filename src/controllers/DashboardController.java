@@ -21,6 +21,7 @@ public class DashboardController implements Initializable {
     @FXML private Button btnRequestMedicine;
     @FXML private Button btnManageItems;
     @FXML private Button btnManageUsers;
+    @FXML private Button btnTransactions;
     @FXML private Button btnLogout;
 
     @FXML private AnchorPane mainContent;
@@ -53,6 +54,11 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleManageUsers() {
         loadView("/views/ManageUsers.fxml");
+    }
+    
+    @FXML
+    private void handleTransactions() {
+        loadView("/views/Transactions.fxml");
     }
 
     @FXML

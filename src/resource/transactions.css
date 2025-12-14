@@ -1,0 +1,146 @@
+/* =========================
+   ROOT
+   ========================= */
+.root {
+    -fx-font-family: "Segoe UI", "Inter", sans-serif;
+    -fx-background-color: #f5f6fa;
+}
+
+/* =========================
+   HEADERS
+   ========================= */
+.title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f235f;
+}
+
+.subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b6f9c;
+}
+
+/* =========================
+   SUMMARY CARDS
+   ========================= */
+.stat-card {
+    -fx-background-color: linear-gradient(
+        to bottom right,
+        #2b2f77,
+        #1f235f
+    );
+    -fx-background-radius: 18;
+    -fx-padding: 20 30 20 30;
+    -fx-alignment: center;
+    -fx-min-width: 220;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 10, 0.3, 0, 4);
+}
+
+.stat-card Label {
+    -fx-text-fill: white;
+}
+
+.stat-number {
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}
+
+/* =========================
+   SEARCH BAR
+   ========================= */
+.text-field {
+    -fx-background-radius: 20;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 13px;
+}
+
+/* =========================
+   TABLE CONTAINER
+   ========================= */
+.table-container {
+    -fx-background-color: #e6e6e6;
+    -fx-background-radius: 18;
+    -fx-padding: 15;
+}
+
+/* =========================
+   TABLE VIEW
+   ========================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2b2f77;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f2f3f8;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #d6d9ff;
+}
+
+/* =========================
+   TRANSACTION TYPE COLORS
+   ========================= */
+.issued-row {
+    -fx-background-color: #7fd9ff;
+}
+
+.received-row {
+    -fx-background-color: #a7f3b0;
+}
+
+.expired-row {
+    -fx-background-color: #ff9a9a;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+.button {
+    -fx-background-color: #2b2f77;
+    -fx-text-fill: white;
+    -fx-background-radius: 14;
+    -fx-padding: 8 18 8 18;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #3b40a0;
+}
+
+/* =========================
+   COMBOBOX
+   ========================= */
+.combo-box {
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+}
+
+/* =========================
+   FOOTER NOTE (OPTIONAL)
+   ========================= */
+.footer-note {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6b6f9c;
+}
