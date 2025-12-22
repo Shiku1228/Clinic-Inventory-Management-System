@@ -14,17 +14,26 @@ import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
 
-    @FXML private VBox sidePanel;
-    @FXML private ImageView imageLogo;
+    @FXML
+    private VBox sidePanel;
+    @FXML
+    private ImageView imageLogo;
 
-    @FXML private Button btnDashboard;
-    @FXML private Button btnRequestMedicine;
-    @FXML private Button btnManageItems;
-    @FXML private Button btnManageUsers;
-    @FXML private Button btnTransactions;
-    @FXML private Button btnLogout;
+    @FXML
+    private Button btnDashboard;
+    @FXML
+    private Button btnRequestMedicine;
+    @FXML
+    private Button btnManageItems;
+    @FXML
+    private Button btnManageUsers;
+    @FXML
+    private Button btnTransactions;
+    @FXML
+    private Button btnLogout;
 
-    @FXML private AnchorPane mainContent;
+    @FXML
+    private AnchorPane mainContent;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -55,7 +64,7 @@ public class DashboardController implements Initializable {
     private void handleManageUsers() {
         loadView("/views/ManageUsers.fxml");
     }
-    
+
     @FXML
     private void handleTransactions() {
         loadView("/views/Transactions.fxml");
@@ -69,13 +78,20 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Utility method to load FXML into mainContent.
-     * Ensures the loaded AnchorPane fills the entire mainContent.
+     * Utility method to load FXML into mainContent. Ensures the loaded
+     * AnchorPane fills the entire mainContent.
      */
     private void loadView(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             AnchorPane pane = loader.load();
+
+            Object controller = loader.getController();
+
+            //Inject DashboardController if DasboardContent is loaded
+            if (controller instanceof DashboardContentController) {
+                ((DashboardContentController) controller).setDashboardController(this);
+            }
 
             // Clear previous content and set new content
             mainContent.getChildren().setAll(pane);
@@ -85,9 +101,26 @@ public class DashboardController implements Initializable {
             AnchorPane.setBottomAnchor(pane, 0.0);
             AnchorPane.setLeftAnchor(pane, 0.0);
             AnchorPane.setRightAnchor(pane, 0.0);
+
         } catch (IOException e) {
             System.err.println("Failed to load FXML: " + fxmlPath);
             e.printStackTrace();
+        }
+    }
+
+    public void navigateFromDashboard(String target) {
+        switch (target) {
+            case "MANAGE_ITEMS":
+                handleManageItems();
+                break;
+            case "MANAGE_USERS":
+                handleManageUsers();
+                break;
+            case "TRANSACTIONS":
+                handleTransactions();
+                break;
+            default:
+                System.out.println("Unknown navigation target: " + target);
         }
     }
 }

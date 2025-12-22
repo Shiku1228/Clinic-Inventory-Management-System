@@ -36,6 +36,8 @@ public class DashboardContentController {
     private VBox requestTodayCard;
     @FXML
     private VBox expiredItemsCard;
+    
+    private DashboardController dashboardController;
 
     public void initialize() {
         // Initialize date/time
@@ -88,20 +90,20 @@ public class DashboardContentController {
     private void handleSummaryClick(String usage) {
         switch (usage) {
             case "Medicines":
-                System.out.println("Total Medicine Card Clicked!");
-                break;
             case "Supplies":
-                System.out.println("Low Supply Card Clicked");
+            case "Expired Items":    
+                dashboardController.navigateFromDashboard("MANAGE_ITEMS");
                 break;
             case "Users":
-                System.out.println("Total Users Card Clicked");
+                dashboardController.navigateFromDashboard("MANAGE_USERS");
                 break;
             case "Requests":
-                System.out.println("Requests Today Card Clicked");
-                break;
-            case "Expired Items":
-                System.out.println("Expired Items Card");
+                dashboardController.navigateFromDashboard("TRANSACTIONS");
                 break;
         }
+    }
+    
+    public void setDashboardController(DashboardController controller){
+        this.dashboardController = controller;
     }
 }
