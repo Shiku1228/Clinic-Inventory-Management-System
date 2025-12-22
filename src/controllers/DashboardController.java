@@ -11,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
+import controllers.DashboardContentController;
 
 public class DashboardController implements Initializable {
 
@@ -47,26 +48,31 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void handleDashboard() {
+        setActiveButton(btnDashboard);
         loadView("/views/DashboardContent.fxml");
     }
 
     @FXML
-    private void handleRequestMedicine() {
+    public void handleRequestMedicine() {
+        setActiveButton(btnRequestMedicine);
         loadView("/views/RequestMedicine.fxml");
     }
 
     @FXML
-    private void handleManageItems() {
+    public void handleManageItems() {
+        setActiveButton(btnManageItems);
         loadView("/views/ManageItems.fxml");
     }
 
     @FXML
-    private void handleManageUsers() {
+    public void handleManageUsers() {
+        setActiveButton(btnManageUsers);
         loadView("/views/ManageUsers.fxml");
     }
 
     @FXML
-    private void handleTransactions() {
+    public void handleTransactions() {
+        setActiveButton(btnTransactions);
         loadView("/views/Transactions.fxml");
     }
 
@@ -87,10 +93,13 @@ public class DashboardController implements Initializable {
             AnchorPane pane = loader.load();
 
             Object controller = loader.getController();
+            
 
             //Inject DashboardController if DasboardContent is loaded
             if (controller instanceof DashboardContentController) {
-                ((DashboardContentController) controller).setDashboardController(this);
+                DashboardContentController dc = (DashboardContentController)controller;
+                dc.setDashboardController(this);
+                dc.setupNavigation();
             }
 
             // Clear previous content and set new content
@@ -121,6 +130,20 @@ public class DashboardController implements Initializable {
                 break;
             default:
                 System.out.println("Unknown navigation target: " + target);
+        }
+    }
+    
+    private void setActiveButton (Button activeButton){
+        //remove active style from the rest of inactive buttons
+        btnDashboard.getStyleClass().remove("nav-button-active");
+        btnRequestMedicine.getStyleClass().remove("nav-button-active");
+        btnManageItems.getStyleClass().remove("nav-button-active");
+        btnManageUsers.getStyleClass().remove("nav-button-active");
+        btnTransactions.getStyleClass().remove("nav-button-active");
+        
+        //add active style clicked button
+        if (!activeButton.getStyleClass().contains("nav-button-active")){
+            activeButton.getStyleClass().add("nav-button-active");
         }
     }
 }

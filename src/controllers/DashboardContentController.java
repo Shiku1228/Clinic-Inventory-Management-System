@@ -36,13 +36,16 @@ public class DashboardContentController {
     private VBox requestTodayCard;
     @FXML
     private VBox expiredItemsCard;
-    
+
     private DashboardController dashboardController;
 
     public void initialize() {
         // Initialize date/time
         updateDateTime();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.minutes(1), e -> updateDateTime()));
+        
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.minutes(1), e -> updateDateTime())
+        );
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
@@ -55,13 +58,6 @@ public class DashboardContentController {
 
         // Set welcome message
         welcomeLabel.setText("Welcome Back, Nurse!");
-
-        //dashboard cards clickable
-        totalMedicinesCard.setOnMouseClicked(e -> handleSummaryClick("Medicines"));
-        lowSupplyCard.setOnMouseClicked(e -> handleSummaryClick("Supplies"));
-        registeredUserCard.setOnMouseClicked(e -> handleSummaryClick("Users"));
-        requestTodayCard.setOnMouseClicked(e -> handleSummaryClick("Requests"));
-        expiredItemsCard.setOnMouseClicked(e -> handleSummaryClick("Expired Items"));
     }
 
     private void updateDateTime() {
@@ -74,36 +70,54 @@ public class DashboardContentController {
     // You can leave them empty or print a message for now
     @FXML
     private void handleAddNewMedicine() {
-        System.out.println("Quick Action: Add New Medicine clicked");
+        if (dashboardController != null) {
+            dashboardController.handleManageItems();
+        }
     }
 
     @FXML
     private void handleViewInventory() {
-        System.out.println("Quick Action: View Inventory clicked");
+        if (dashboardController != null) {
+            dashboardController.handleManageItems();
+        }
     }
 
     @FXML
     private void handleNewRequest() {
-        System.out.println("Quick Action: New Request clicked");
+        if (dashboardController != null) {
+            dashboardController.handleRequestMedicine();
+        }
     }
 
     private void handleSummaryClick(String usage) {
+        if (dashboardController == null) {
+            System.err.println("Dashboard Controller is not injected yet!");
+            return;
+        }
         switch (usage) {
             case "Medicines":
             case "Supplies":
-            case "Expired Items":    
-                dashboardController.navigateFromDashboard("MANAGE_ITEMS");
+            case "Expired Items":
+                dashboardController.handleManageItems();
                 break;
             case "Users":
-                dashboardController.navigateFromDashboard("MANAGE_USERS");
+                dashboardController.handleManageUsers();
                 break;
             case "Requests":
-                dashboardController.navigateFromDashboard("TRANSACTIONS");
+                dashboardController.handleTransactions();
                 break;
         }
     }
-    
-    public void setDashboardController(DashboardController controller){
+
+    public void setDashboardController(DashboardController controller) {
         this.dashboardController = controller;
+    }
+
+    public void setupNavigation() {
+        totalMedicinesCard.setOnMouseClicked(e -> handleSummaryClick("Medicines"));
+        lowSupplyCard.setOnMouseClicked(e -> handleSummaryClick("Supplies"));
+        registeredUserCard.setOnMouseClicked(e -> handleSummaryClick("Users"));
+        requestTodayCard.setOnMouseClicked(e -> handleSummaryClick("Requests"));
+        expiredItemsCard.setOnMouseClicked(e -> handleSummaryClick("Expired Items"));
     }
 }

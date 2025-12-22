@@ -97,3 +97,17 @@
     -fx-font-size: 12px;
     -fx-padding: 0 0 0 0;
 }
+
+/* ===============================
+   ACTIVE SIDEBAR BUTTONS
+=============================== */
+.nav-button-active {
+    -fx-background-color: #FFEB50;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+}
+
+.nav-button-active:hover {
+    -fx-background-color: #cfbe3e;
+}
