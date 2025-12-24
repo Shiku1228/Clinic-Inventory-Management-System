@@ -1,0 +1,37 @@
+.dialog-card {
+    -fx-background-color: white;
+    -fx-padding: 25;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #141652;
+    -fx-border-width: 5;
+}
+
+.dialog-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #141652;
+}
+
+.label {
+    -fx-font-size: 13px;
+}
+
+.text-field, .combo-box, .date-picker {
+    -fx-background-radius: 8;
+}
+ 
+.primary-btn {
+    -fx-background-color: #141652;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-pref-width: 180;
+    -fx-background-radius: 10;
+}
+
+.secondary-btn {
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #141652;
+    -fx-pref-width: 180;
+    -fx-background-radius: 10;
+}

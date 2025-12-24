@@ -11,10 +11,15 @@ import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import models.Items;
 
@@ -161,7 +166,7 @@ public class ManageItemsController implements Initializable {
 
         //Action Button Placeholders
         addItemBtn.setOnAction(e
-                -> System.out.println("Add New Item clicked"));
+                -> handleAddItem());
         updateStockBtn.setOnAction(e
                 -> System.out.println("Update Stock clicked"));
         exportDataBtn.setOnAction(e
@@ -298,4 +303,28 @@ public class ManageItemsController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleAddItem() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/AddItemDialog.fxml")
+            );
+
+            AnchorPane root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add New Item");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(addItemBtn.getScene().getWindow());
+
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+            dialogStage.setResizable(false);
+
+            dialogStage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
