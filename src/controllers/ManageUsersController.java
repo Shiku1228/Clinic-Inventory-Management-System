@@ -18,6 +18,12 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import models.Users;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
+import javafx.application.Platform;
 
 public class ManageUsersController implements Initializable {
 
@@ -49,13 +55,13 @@ public class ManageUsersController implements Initializable {
     @FXML
     private Label userEmail;
     @FXML
-    private Label userPhone;
+    private Label userContact;
     @FXML
     private Button editButton;
     @FXML
     private Button deactivateButton;
 
-    //User Table
+    //User Table    
     @FXML
     TableView<Users> usersTable;
     @FXML
@@ -73,6 +79,7 @@ public class ManageUsersController implements Initializable {
     }
 
     private void setupSummaryCards() {
+        ObservableList<Users> visibleUsers = usersTable.getItems();
         //Update numnbers dynamically based on the User List
         long directors = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Director")).count();
         long doctors = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Doctor")).count();
@@ -96,6 +103,12 @@ public class ManageUsersController implements Initializable {
         TableColumn<Users, String> roleCol = new TableColumn<>("Role");
         roleCol.setCellValueFactory(cellData -> cellData.getValue().roleProperty());
 
+        TableColumn<Users, String> contactCol = new TableColumn<>("Contact");
+        contactCol.setCellValueFactory(cellData -> cellData.getValue().contactProperty());
+
+        TableColumn<Users, String> emailCol = new TableColumn<>("Email");
+        emailCol.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
+
         TableColumn<Users, String> statusCol = new TableColumn<>("Status");
         statusCol.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
@@ -105,10 +118,13 @@ public class ManageUsersController implements Initializable {
             private final Button toggleButton = new Button("Deactivate");
 
             {
+                editButton.getStyleClass().add("table-edit-btn");
+
                 editButton.setOnAction(event -> {
                     Users user = getTableView().getItems().get(getIndex());
                     showSelectedUser(user);
                 });
+
                 toggleButton.setOnAction(event -> {
                     Users user = getTableView().getItems().get(getIndex());
 
@@ -118,7 +134,9 @@ public class ManageUsersController implements Initializable {
                         user.setStatus("Active");
                     }
 
+                    updateToggleButton(user);
                     usersTable.refresh();
+                    usersTable.getSelectionModel().select(user);
                     setupSummaryCards();
                 });
             }
@@ -132,25 +150,80 @@ public class ManageUsersController implements Initializable {
                 } else {
                     Users user = getTableView().getItems().get(getIndex());
 
-                    toggleButton.setText(
-                            user.getStatus().equalsIgnoreCase("Active") ? "Deactivate" : "Activate"
-                    );
-
-                    HBox box = new HBox(5, editButton, toggleButton);
+                    updateToggleButton(user);
+                    HBox box = new HBox(6, editButton, toggleButton);
                     setGraphic(box);;
                 }
             }
+            
+            //for styling the toggleButton
+            private void updateToggleButton(Users user) {
+                toggleButton.getStyleClass().removeAll(
+                        "table-toggle-active",
+                        "table-toggle-inactive"
+                );
+
+                if (user.getStatus().equalsIgnoreCase("Active")) {
+                    toggleButton.setText("Deactivate");
+                    toggleButton.getStyleClass().add("table-toggle-active");
+                } else {
+                    toggleButton.setText("Activate");
+                    toggleButton.getStyleClass().add("table-toggle-inactive");
+                }
+            }
+
         });
 
-        usersTable.getColumns().setAll(idCol, nameCol, roleCol, statusCol, actionsCol);
+        usersTable.getColumns().setAll(idCol, nameCol, roleCol, contactCol, emailCol, statusCol, actionsCol);
+        usersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         //Sample data items
         userList.addAll(
-                new Users("1", "Renz Latangga", "Director", "Active", "/resource/avatars/renz_pfp.png"),
-                new Users("2", "John Daniel Marañan", "Doctor", "Active", "/resource/avatars/janjan_pfp.png"),
-                new Users("3", "John Christian Abelgas", "Nurse", "Active", "/resource/avatars/upaw_pfp.png"),
-                new Users("4", "Merdin Harid", "Admin", "Active", "/resource/avatars/merdin_pfp.png"),
-                new Users("5", "Krish Talino", "Admin", "Active", "/resource/avatars/krish_pfp.png")
+                new Users(
+                        "1",
+                        "Renz Latangga",
+                        "Director",
+                        "09999999999",
+                        "renz@email.com",
+                        "Active",
+                        "/resource/avatars/renz_pfp.png"
+                ),
+                new Users(
+                        "2",
+                        "John Daniel Marañan",
+                        "Doctor",
+                        "09998887777",
+                        "janjan@email.com",
+                        "Active",
+                        "/resource/avatars/janjan_pfp.png"
+                ),
+                new Users(
+                        "3",
+                        "John Christian Abelgas",
+                        "Nurse",
+                        "09997776666",
+                        "upaw@email.com",
+                        "Active",
+                        "/resource/avatars/upaw_pfp.png"
+                ),
+                new Users(
+                        "4",
+                        "Merdin Harid",
+                        "Admin",
+                        "09996665555",
+                        "merdin@email.com",
+                        "Active",
+                        "/resource/avatars/merdin_pfp.png"
+                ),
+                new Users(
+                        "5",
+                        "Krish Talino",
+                        "Admin",
+                        "09995554444",
+                        "krish@email.com",
+                        "Active",
+                        "/resource/avatars/krish_pfp.png"
+                )
         );
 
         usersTable.setItems(userList);
@@ -183,7 +256,7 @@ public class ManageUsersController implements Initializable {
 
         //add user button
         addUserButton.setOnAction(e -> {
-            System.out.println("The add user button was clicked!");
+            openAddUserDialog();
         });
     }
 
@@ -191,8 +264,8 @@ public class ManageUsersController implements Initializable {
         // Update user info
         userName.setText(user.getName());
         userClinic.setText("Clinic Inventory Management System");
-        userEmail.setText(user.getName().toLowerCase().replace(" ", "") + "@email.com");
-        userPhone.setText("09999999999");
+        userEmail.setText(user.getEmail());
+        userContact.setText(user.getContact());
 
         // Load the user's own avatar image from their userList
         Image avatar;
@@ -290,5 +363,45 @@ public class ManageUsersController implements Initializable {
         sortedData.comparatorProperty().bind(usersTable.comparatorProperty());
 
         usersTable.setItems(sortedData);
+
+        if (!sortedData.isEmpty()) {
+            usersTable.getSelectionModel().selectFirst();
+        }
+
+        Platform.runLater(() -> {
+            if (!usersTable.getItems().isEmpty()) {
+                usersTable.getSelectionModel().selectFirst();
+            }
+        });
+
+    }
+
+    private void openAddUserDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/AddUserDialog.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add User");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setScene(scene);
+
+            //get the controller instance
+            AddUserDialogController controller = loader.getController();
+
+            dialogStage.showAndWait();
+
+            Users newUser = controller.getCreatedUser();
+            if (newUser != null) {
+                userList.add(newUser);
+                setupSummaryCards();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

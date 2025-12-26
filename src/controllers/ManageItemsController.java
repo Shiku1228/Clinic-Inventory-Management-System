@@ -168,7 +168,7 @@ public class ManageItemsController implements Initializable {
         addItemBtn.setOnAction(e
                 -> handleAddItem());
         updateStockBtn.setOnAction(e
-                -> System.out.println("Update Stock clicked"));
+                -> handleUpdateStock());
         exportDataBtn.setOnAction(e
                 -> System.out.println("Export Data clicked"));
         removeExpiredBtn.setOnAction(e
@@ -327,4 +327,30 @@ public class ManageItemsController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void handleUpdateStock() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/UpdateStockDialog.fxml") // path to your FXML
+            );
+
+            AnchorPane root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Update Stock");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(updateStockBtn.getScene().getWindow());
+
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+            dialogStage.setResizable(false);
+
+            dialogStage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

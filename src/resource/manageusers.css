@@ -194,3 +194,48 @@
 .delete-btn:hover {
     -fx-background-color: #B71C1C;
 }
+
+/* =====================
+   TABLE ACTION BUTTONS
+   ===================== */
+
+.table-edit-btn {
+    -fx-background-color: #1E1F70;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 4 12;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+}
+
+.table-edit-btn:hover {
+    -fx-background-color: #141652;
+}
+
+/* Active = yellow */
+.table-toggle-active {
+    -fx-background-color: #FFEB50;
+    -fx-text-fill: black;
+    -fx-background-radius: 12;
+    -fx-padding: 4 12;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+}
+
+.table-toggle-active:hover {
+    -fx-background-color: #FDD835;
+}
+
+/* Inactive = red */
+.table-toggle-inactive {
+    -fx-background-color: #D32F2F;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 4 12;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+}
+
+.table-toggle-inactive:hover {
+    -fx-background-color: #B71C1C;
+}

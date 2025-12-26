@@ -85,7 +85,7 @@
                 <Label fx:id="userName" styleClass="user-name" text="" />
                 <Label fx:id="userClinic" styleClass="user-info" text="" />
                 <Label fx:id="userEmail" styleClass="user-info" text="" />
-                <Label fx:id="userPhone" styleClass="user-info" text="" />
+                <Label fx:id="userContact" styleClass="user-info" text="" />
             </VBox>
 
             <Region prefHeight="90.0" prefWidth="277.0" HBox.hgrow="ALWAYS" />
@@ -101,15 +101,7 @@
         <!-- USERS TABLE -->
         <VBox spacing="10" styleClass="table-container">
 
-            <TableView fx:id="usersTable" prefHeight="250">
-                <columns>
-                    <TableColumn text="User ID" />
-                    <TableColumn text="Name" />
-                    <TableColumn text="Role" />
-                    <TableColumn text="Status" />
-                    <TableColumn text="Actions" />
-                </columns>
-            </TableView>
+            <TableView fx:id="usersTable" prefHeight="250"></TableView>
 
             <HBox alignment="CENTER_RIGHT">
                 <Button fx:id="addUserButton" styleClass="primary-btn" text="Add User" />
