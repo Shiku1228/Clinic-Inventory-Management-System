@@ -43,7 +43,7 @@
             <VBox fx:id="totalMedicinesCard" alignment="CENTER" prefWidth="200.0" style="-fx-background-color: #141652;" styleClass="summary-card">
                 <ImageView fitHeight="56.0" fitWidth="56.0">
                     <image>
-                        <Image url="@../resource/medicine.png" />
+                        <Image url="@../resource/images_icons/medicine.png" />
                     </image>
                 </ImageView>
                 <Label style="-fx-font-family: Impact; -fx-font-size: 20;" text="Total Medicines:" textFill="WHITE" />
@@ -54,7 +54,7 @@
             <VBox fx:id="totalSuppliesCard" alignment="CENTER" prefWidth="200.0" style="-fx-background-color: #33357A;" styleClass="summary-card">
                 <ImageView fitHeight="60.0" fitWidth="65.0">
                     <image>
-                        <Image url="@../resource/medkit.png" />
+                        <Image url="@../resource/images_icons/medkit.png" />
                     </image>
                 </ImageView>
                 <Label style="-fx-font-family: Impact; -fx-font-size: 20;" text="Total Supplies:" textFill="WHITE" />
@@ -65,7 +65,7 @@
             <VBox fx:id="totalEquipmentsCard" alignment="CENTER" prefWidth="200.0" style="-fx-background-color: #141652;" styleClass="summary-card">
                 <ImageView fitHeight="57.0" fitWidth="57.0">
                     <image>
-                        <Image url="@../resource/stethoscope.png" />
+                        <Image url="@../resource/images_icons/stethoscope.png" />
                     </image>
                 </ImageView>
                 <Label style="-fx-font-family: Impact; -fx-font-size: 20;" text="Total Equipments:" textFill="WHITE" />
@@ -76,7 +76,7 @@
             <VBox fx:id="lowStocksCard" alignment="CENTER" prefWidth="200.0" style="-fx-background-color: #33357A;" styleClass="summary-card">
                 <ImageView fitHeight="60.0" fitWidth="65.0">
                     <image>
-                        <Image url="@../resource/warning.png" />
+                        <Image url="@../resource/images_icons/warning.png" />
                     </image>
                 </ImageView>
                 <Label style="-fx-font-family: Impact; -fx-font-size: 20;" text="Low Stocks:" textFill="WHITE" />

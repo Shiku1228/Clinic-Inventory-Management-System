@@ -72,19 +72,19 @@ public class ManageUsersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupSummaryCards();
         setupUsersTable();
-        setupSelectedUserCard();
         setupSearch();
+        setupSelectedUserCard();
+        setupSummaryCards();
     }
 
     private void setupSummaryCards() {
         ObservableList<Users> visibleUsers = usersTable.getItems();
         //Update numnbers dynamically based on the User List
-        long directors = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Director")).count();
-        long doctors = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Doctor")).count();
-        long nurses = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Nurse")).count();
-        long admins = userList.stream().filter(u -> u.getRole().equalsIgnoreCase("Admin")).count();
+        long directors = visibleUsers.stream().filter(u -> u.getRole().equalsIgnoreCase("Director")).count();
+        long doctors = visibleUsers.stream().filter(u -> u.getRole().equalsIgnoreCase("Doctor")).count();
+        long nurses = visibleUsers.stream().filter(u -> u.getRole().equalsIgnoreCase("Nurse")).count();
+        long admins = visibleUsers.stream().filter(u -> u.getRole().equalsIgnoreCase("Admin")).count();
 
         ((Label) directorCard.getChildren().get(0)).setText(String.valueOf(directors));
         ((Label) doctorCard.getChildren().get(0)).setText(String.valueOf(doctors));
@@ -122,7 +122,7 @@ public class ManageUsersController implements Initializable {
 
                 editButton.setOnAction(event -> {
                     Users user = getTableView().getItems().get(getIndex());
-                    showSelectedUser(user);
+                    openEditUserDialog(user);
                 });
 
                 toggleButton.setOnAction(event -> {
@@ -241,7 +241,7 @@ public class ManageUsersController implements Initializable {
         editButton.setOnAction(e -> {
             Users selected = usersTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                showSelectedUser(selected);
+                openEditUserDialog(selected);
             }
         });
 
@@ -340,7 +340,7 @@ public class ManageUsersController implements Initializable {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(user -> {
 
-                //if searc field is empty
+                //if search field is empty
                 if (newValue == null || newValue.isBlank()) {
                     return true;
                 }
@@ -348,15 +348,12 @@ public class ManageUsersController implements Initializable {
                 String searchKeyword = newValue.toLowerCase();
 
                 //match name, role, status
-                if (user.getName().toLowerCase().contains(searchKeyword)) {
-                    return true;
-                } else if (user.getRole().toLowerCase().contains(searchKeyword)) {
-                    return true;
-                } else if (user.getStatus().toLowerCase().contains(searchKeyword)) {
-                    return true;
-                }
-                return false;
+                return user.getName().toLowerCase().contains(searchKeyword)
+                        || user.getRole().toLowerCase().contains(searchKeyword)
+                        || user.getStatus().toLowerCase().contains(searchKeyword);
             });
+            
+            setupSummaryCards();
         });
 
         SortedList<Users> sortedData = new SortedList<>(filteredData);
@@ -401,6 +398,35 @@ public class ManageUsersController implements Initializable {
                 setupSummaryCards();
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @FXML
+    private void openEditUserDialog(Users user){
+        try{
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/EditUserDialog.fxml")
+            );
+            
+            Scene scene = new Scene(loader.load());
+            
+            Stage stage = new Stage();
+            stage.setTitle("Edit User");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.setScene(scene);
+            
+            EditUserDialogController controller = loader.getController();
+            controller.setUser(user);
+            
+            stage.showAndWait();
+            
+            
+            usersTable.refresh();
+            setupSummaryCards();
+            
+        } catch (IOException e){
             e.printStackTrace();
         }
     }

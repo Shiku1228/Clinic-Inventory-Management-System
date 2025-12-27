@@ -129,6 +129,8 @@ public class ManageItemsController implements Initializable {
 
         // Optional: you can set fixed cell size for more precise control
         itemsTable.setFixedCellSize(rowHeight);
+        itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
 
         // Sample Items
         itemsData
@@ -221,9 +223,10 @@ public class ManageItemsController implements Initializable {
             card.getStyleClass().add("gallery-card");
 
             // IMAGE
-            String imagePath = "src/main/resources/resource/images_icons/medicine.png"; // default
-            ImageView img = new ImageView(new Image("file:" + imagePath));
-            img.getStyleClass().add("item-image");
+            String imagePath = "/resource/images_icons/medicine.png";
+            ImageView img = new ImageView(
+                    new Image(getClass().getResourceAsStream(imagePath))
+            );
 
             // NAME
             Label name = new Label(item.getItemName());
