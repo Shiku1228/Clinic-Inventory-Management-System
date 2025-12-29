@@ -25,6 +25,7 @@ import models.Items;
 import dao.ItemsDAO;
 import java.io.File;
 import java.io.InputStream;
+import javafx.beans.binding.Bindings;
 
 public class ManageItemsController implements Initializable {
 
@@ -117,22 +118,14 @@ public class ManageItemsController implements Initializable {
         colSupplier.setCellValueFactory(new PropertyValueFactory<>("supplier"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Limit TableView to 5 rows dynamically
-        //int maxVisibleRows = 5;
-
+        itemsTable.setFixedCellSize(28);
+        itemsTable.prefHeightProperty().bind(
+                itemsTable.fixedCellSizeProperty()
+                        .multiply(Bindings.size(itemsTable.getItems()).add(1.2))
+        );
         // Get default row height
-        double rowHeight = 24; // default approximate row height
-        if (!itemsTable.getItems().isEmpty()) {
-            rowHeight = itemsTable.getFixedCellSize() > 0 ? itemsTable.getFixedCellSize() : 24;
-        }
-
-        // Calculate total preferred height: rows + header
-        double headerHeight = 25; // approximate, JavaFX TableView header height
-        itemsTable.setPrefHeight(headerHeight + rowHeight /** maxVisibleRows*/);
-
-        // Optional: you can set fixed cell size for more precise control
-        itemsTable.setFixedCellSize(rowHeight);
         itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        itemsTable.setPlaceholder(new Label("No items available"));
 
         // Sample Items
         ItemsDAO itemsDAO = new ItemsDAO();
