@@ -6,8 +6,13 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import models.Transactions;
 
@@ -16,27 +21,37 @@ public class TransactionsController implements Initializable {
     /* =========================
        TABLE & COLUMNS
        ========================= */
-    @FXML private TableView<Transactions> transactionTable;
+    @FXML
+    private TableView<Transactions> transactionTable;
 
-    @FXML private TableColumn<Transactions, String> colDate;
-    @FXML private TableColumn<Transactions, String> colItem;
-    @FXML private TableColumn<Transactions, String> colType;
-    @FXML private TableColumn<Transactions, Integer> colQuantity;
-    @FXML private TableColumn<Transactions, String> colPerformedBy;
-    @FXML private TableColumn<Transactions, String> colRemarks;
-    @FXML private TableColumn<Transactions, Void> colAction;
+    @FXML
+    private TableColumn<Transactions, String> colDate;
+    @FXML
+    private TableColumn<Transactions, String> colItem;
+    @FXML
+    private TableColumn<Transactions, String> colType;
+    @FXML
+    private TableColumn<Transactions, Integer> colQuantity;
+    @FXML
+    private TableColumn<Transactions, String> colPerformedBy;
+    @FXML
+    private TableColumn<Transactions, String> colRemarks;
+    @FXML
+    private TableColumn<Transactions, Void> colAction;
 
     /* =========================
        CONTROLS
        ========================= */
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> filterCombo;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> filterCombo;
 
     /* =========================
        DATA
        ========================= */
-    private final ObservableList<Transactions> transactionList =
-            FXCollections.observableArrayList();
+    private final ObservableList<Transactions> transactionList
+            = FXCollections.observableArrayList();
 
     /* =========================
        INITIALIZE
@@ -70,6 +85,19 @@ public class TransactionsController implements Initializable {
         loadSampleTransactions();
 
         transactionTable.setItems(transactionList);
+        transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        addViewButtonToTable();
+
+        transactionTable.setRowFactory(tv -> {
+            TableRow<Transactions> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getClickCount() == 2) {
+                    openTransactionDetails(row.getItem());
+                }
+            });
+            return row;
+        });
     }
 
     /* =========================
@@ -77,30 +105,30 @@ public class TransactionsController implements Initializable {
        ========================= */
     private void loadSampleTransactions() {
         transactionList.addAll(
-            new Transactions(
-                "2025-11-14 10:21 AM",
-                "Paracetamol",
-                "Issued",
-                -5,
-                "Nurse Anna",
-                "Request #102"
-            ),
-            new Transactions(
-                "2025-11-14 09:32 AM",
-                "Alcohol",
-                "Received",
-                50,
-                "Admin Juan",
-                "Delivered by RMMC"
-            ),
-            new Transactions(
-                "2025-11-13 07:50 AM",
-                "Betadine",
-                "Expired",
-                -2,
-                "System Notification",
-                "Auto Expiry"
-            )
+                new Transactions(
+                        "2025-11-14 10:21 AM",
+                        "Paracetamol",
+                        "Issued",
+                        -5,
+                        "Nurse Anna",
+                        "Request #102"
+                ),
+                new Transactions(
+                        "2025-11-14 09:32 AM",
+                        "Alcohol",
+                        "Received",
+                        50,
+                        "Admin Juan",
+                        "Delivered by RMMC"
+                ),
+                new Transactions(
+                        "2025-11-13 07:50 AM",
+                        "Betadine",
+                        "Expired",
+                        -2,
+                        "System Notification",
+                        "Auto Expiry"
+                )
         );
     }
 
@@ -125,4 +153,60 @@ public class TransactionsController implements Initializable {
         System.out.println("Searching: " + keyword);
         // TODO: Implement search filtering
     }
+
+    private void addViewButtonToTable() {
+        colAction.setCellFactory(param -> new TableCell<>() {
+
+            private final Button viewButton = new Button("View");
+
+            {
+                viewButton.setOnAction(event -> {
+                    Transactions transaction
+                            = getTableView().getItems().get(getIndex());
+                    openTransactionDetails(transaction);
+                });
+
+                viewButton.setStyle("-fx-font-size: 11px;");
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(viewButton);
+                }
+            }
+        });
+    }
+
+    private void openTransactionDetails(Transactions transaction) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/TransactionDetails.fxml")
+            );
+
+            Parent root = loader.load();
+
+            // Get the controller of the dialog
+            TransactionDetailsController controller = loader.getController();
+
+            // Pass the selected transaction
+            controller.setTransaction(transaction);
+
+            // Create modal window
+            Stage stage = new Stage();
+            stage.setTitle("Transaction Details");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

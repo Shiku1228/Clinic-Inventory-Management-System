@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import dao.ItemsDAO;
 import java.io.File;
 import javafx.fxml.FXML;
 import java.net.URL;
@@ -13,14 +14,15 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
+import models.Items;
 
 /**
  * FXML Controller class
  *
  * @author RENZ S. LATANGGA
  */
-public class AddItemDialogController implements Initializable{
-    
+public class AddItemDialogController implements Initializable {
+
     //Text Fields
     @FXML
     private TextField itemNameField;
@@ -28,7 +30,7 @@ public class AddItemDialogController implements Initializable{
     private TextField stockField;
     @FXML
     private TextField supplierField;
-    
+
     //Combo Boxes
     @FXML
     private ComboBox<String> categoryBox;
@@ -36,7 +38,7 @@ public class AddItemDialogController implements Initializable{
     private ComboBox<String> unitBox;
     @FXML
     private ComboBox<String> statusBox;
-    
+
     //Date Picker
     @FXML
     private DatePicker expiryDatePicker;
@@ -47,22 +49,24 @@ public class AddItemDialogController implements Initializable{
     private Button submitButton;
     @FXML
     private Button cancelButton;
-    
+
     private File selectedImage;
     @FXML
     private VBox expiryContainer;
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //hide expiry container by default (it depends on the category)
         expiryContainer.setVisible(false);
         expiryContainer.setManaged(false);
-        
+
         //add listener to categoryBox
         categoryBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal == null) return;
-            
-            if (newVal.equalsIgnoreCase("Equipment")){
+            if (newVal == null) {
+                return;
+            }
+
+            if (newVal.equalsIgnoreCase("Equipment")) {
                 expiryContainer.setVisible(false);
                 expiryContainer.setManaged(false);
                 expiryDatePicker.setValue(null);
@@ -78,69 +82,99 @@ public class AddItemDialogController implements Initializable{
                 "Supplies",
                 "Equipment"
         );
-        
+
         unitBox.getItems().addAll(
-                "pcs",
-                "box",
-                "bottle",
-                "pack"
+                "Pieces",
+                "Box",
+                "Bottle",
+                "Pack"
         );
-        
+
         statusBox.getItems().addAll(
                 "Available",
                 "Low Stock",
                 "Out of Stock"
         );
     }
-    
+
     //Button Hnadlers
     @FXML
-    private void handleChooseImage(){
+    private void handleChooseImage() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select an item image!");
-        
+
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter(
                         "Image Files", "*.png", "*.jpg", "*.jpeg"
                 )
         );
-        
+
         selectedImage = chooser.showOpenDialog(getStage());
-        
-        if(selectedImage != null){
+
+        if (selectedImage != null) {
             chooseImageButton.setText("Image Selected");
         }
     }
-    
+
     @FXML
-    private void handleSubmit(){
-        //Temp output since no Dbs available
-        System.out.println("====ADD ITEM=====");
-        System.out.println("Name: " + itemNameField.getText());
-        System.out.println("Category: " + categoryBox.getValue());
-        System.out.println("Stock: " + stockField.getText());
-        System.out.println("Unit: " + unitBox.getValue());
-        System.out.println("Expiry Date: " + expiryDatePicker.getValue());
-        System.out.println("Supplier: " + supplierField.getText());
-        System.out.println("Status: " + statusBox.getValue());
-        System.out.println("Image: " + (selectedImage != null ? selectedImage.getName(): "None"));
-               
+    private void handleSubmit() {
+        try {
+            ItemsDAO dao = new ItemsDAO();
+            Items newItem = new Items(
+                    null, //item ID can be genrated automatically of needed
+                    itemNameField.getText(),
+                    categoryBox.getValue(),
+                    Integer.parseInt(stockField.getText()),
+                    unitBox.getValue(),
+                    expiryDatePicker.getValue() != null ? expiryDatePicker.getValue().toString() : null,
+                    supplierField.getText(),
+                    statusBox.getValue(),
+                    null //will set after handling the images
+            );
+
+            //handles the image upload
+            if (selectedImage != null) {
+                // Target folder: existing resource/medImages
+                File targetDir = new File("src/resource/medImages"); // <-- updated to your existing folder
+                if (!targetDir.exists()) {
+                    targetDir.mkdirs();
+                }
+
+                // Destination file
+                File destFile = new File(targetDir, selectedImage.getName());
+
+                // Copy the file
+                java.nio.file.Files.copy(
+                        selectedImage.toPath(),
+                        destFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+
+                // Save relative path to newItem
+                newItem.setImagePath(destFile.getPath()); // <-- store full path
+            }
+
+            dao.addItem(newItem);
+
+            closeDialog();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleCancel() {
         closeDialog();
     }
-    
-    @FXML
-    private void handleCancel(){
-        closeDialog();
-    }
-    
-    private void closeDialog(){
+
+    private void closeDialog() {
         Stage stage = getStage();
-        if (stage != null){
+        if (stage != null) {
             stage.close();
         }
     }
-    
-    private Stage getStage(){
-        return(Stage) itemNameField.getScene().getWindow();
+
+    private Stage getStage() {
+        return (Stage) itemNameField.getScene().getWindow();
     }
 }

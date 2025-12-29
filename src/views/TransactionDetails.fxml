@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/24"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.TransactionDetailsController"
+            prefWidth="520"
+            prefHeight="480"
+            style="-fx-background-color: transparent;">
+
+    <!-- MAIN CARD -->
+    <VBox spacing="16"
+          AnchorPane.topAnchor="10"
+          AnchorPane.bottomAnchor="10"
+          AnchorPane.leftAnchor="10"
+          AnchorPane.rightAnchor="10"
+          style="
+              -fx-background-color: white;
+              -fx-border-color: #1f235f;
+              -fx-border-width: 4;
+              -fx-border-radius: 25;
+              -fx-background-radius: 25;
+              -fx-padding: 25;
+          ">
+
+        <!-- TITLE -->
+        <Label text="Transaction Details"
+               style="
+                   -fx-font-size: 18px;
+                   -fx-font-weight: bold;
+                   -fx-text-fill: #1f235f;
+               "/>
+
+        <!-- FORM -->
+        <GridPane hgap="12" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="160"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <!-- Date -->
+            <Label text="Date And Time:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtDate" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <!-- Requester -->
+            <Label text="Name of Requester:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtRequester" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <!-- ID -->
+            <Label text="ID No. of Requester:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtRequesterId" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <!-- Item -->
+            <Label text="Item Name:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtItem" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <!-- Type -->
+            <Label text="Type:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtType" editable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <!-- Quantity -->
+            <Label text="Quantity:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtQuantity" editable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <!-- Performed -->
+            <Label text="Performed by:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtPerformedBy" editable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+            <!-- Remarks -->
+            <Label text="Remarks:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtRemarks" editable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+            <!-- Transaction No -->
+            <Label text="Transaction No.:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtTransactionNo" editable="false" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <!-- BUTTONS -->
+        <VBox spacing="8" alignment="CENTER">
+            <Button text="Return"
+                    maxWidth="200"
+                    style="
+                        -fx-background-color: #1f235f;
+                        -fx-text-fill: white;
+                        -fx-background-radius: 12;
+                    "/>
+
+            <Button text="Okay"
+                    maxWidth="200"
+                    onAction="#handleClose"
+                    style="
+                        -fx-background-color: #1f235f;
+                        -fx-text-fill: white;
+                        -fx-background-radius: 12;
+                    "/>
+        </VBox>
+
+    </VBox>
+</AnchorPane>

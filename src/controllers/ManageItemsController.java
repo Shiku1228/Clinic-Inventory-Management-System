@@ -22,6 +22,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import models.Items;
+import dao.ItemsDAO;
+import java.io.File;
+import java.io.InputStream;
 
 public class ManageItemsController implements Initializable {
 
@@ -115,7 +118,7 @@ public class ManageItemsController implements Initializable {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Limit TableView to 5 rows dynamically
-        int maxVisibleRows = 5;
+        //int maxVisibleRows = 5;
 
         // Get default row height
         double rowHeight = 24; // default approximate row height
@@ -125,20 +128,16 @@ public class ManageItemsController implements Initializable {
 
         // Calculate total preferred height: rows + header
         double headerHeight = 25; // approximate, JavaFX TableView header height
-        itemsTable.setPrefHeight(headerHeight + rowHeight * maxVisibleRows);
+        itemsTable.setPrefHeight(headerHeight + rowHeight /** maxVisibleRows*/);
 
         // Optional: you can set fixed cell size for more precise control
         itemsTable.setFixedCellSize(rowHeight);
         itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-
         // Sample Items
-        itemsData
-                .addAll(
-                        new Items("001", "Paracetamol", "Medicine", 50, "pcs", "2026-01-01", "Supplier A", "Available"),
-                        new Items("002", "Syringe", "Supplies", 10, "pcs", "2025-12-01", "Supplier B", "Low Stock"),
-                        new Items("003", "Stethoscope", "Equipment", 5, "pcs", "2027-06-01", "Supplier C", "Low Stock")
-                );
+        ItemsDAO itemsDAO = new ItemsDAO();
+        itemsData = itemsDAO.getAllItems();
+        itemsTable.setItems(itemsData);
 
         //Set Table Values
         itemsTable.setItems(itemsData);
@@ -223,10 +222,29 @@ public class ManageItemsController implements Initializable {
             card.getStyleClass().add("gallery-card");
 
             // IMAGE
-            String imagePath = "/resource/images_icons/medicine.png";
-            ImageView img = new ImageView(
-                    new Image(getClass().getResourceAsStream(imagePath))
-            );
+            ImageView img = new ImageView();
+            img.setFitWidth(120);
+            img.setFitHeight(120);
+            img.setPreserveRatio(true);
+
+            // Load image from filesystem if available, else use placeholder
+            if (item.getImagePath() != null) {
+                File imgFile = new File(item.getImagePath());
+                if (imgFile.exists()) {
+                    img.setImage(new Image(imgFile.toURI().toString()));
+                } else {
+                    // fallback placeholder
+                    File placeholder = new File("src/resource/medImages/placeholder.png");
+                    if (placeholder.exists()) {
+                        img.setImage(new Image(placeholder.toURI().toString()));
+                    }
+                }
+            } else {
+                File placeholder = new File("src/resource/medImages/placeholder.png");
+                if (placeholder.exists()) {
+                    img.setImage(new Image(placeholder.toURI().toString()));
+                }
+            }
 
             // NAME
             Label name = new Label(item.getItemName());
@@ -356,4 +374,21 @@ public class ManageItemsController implements Initializable {
         }
     }
 
+    private Image loadItemImage(String imagePath) {
+        try {
+            if (imagePath == null || imagePath.isBlank()) {
+                return null;
+            }
+            var stream = getClass().getResource(imagePath);
+            if (stream == null) {
+                System.out.println("Image not found: " + imagePath);
+            }
+
+            return null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
