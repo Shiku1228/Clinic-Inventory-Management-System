@@ -44,7 +44,7 @@ public class RequestMedicineController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         quantityField.setText("1"); //default quantity for the medicine
 
-        loadSampleMedicines();
+        //loadSampleMedicines();
         buildMedicinePopup();
 
         //Show popup when clicked the textfield
@@ -86,12 +86,12 @@ public class RequestMedicineController implements Initializable {
 // POPUP MEDICINE SELECTOR
 // ===============================
     //Popup Gallery for Medicines 
-    private void loadSampleMedicines() {
+    /**private void loadSampleMedicines() {
         medicines.add(new Medicine("Biogesic", "For headache and fever", "/resource/medImages/biogesic.jpg"));
         medicines.add(new Medicine("Neozep", "For colds and flu", "/resource/medImages/neozep.jpg"));
         medicines.add(new Medicine("Alaxan Fr", "Muscle Pain reliever", "/resource/medImages/alaxan.jpg"));
         medicines.add(new Medicine("Decolgen", "Sinus, allergies, & flu relief", "/resource/medImages/decolgen.jpg"));
-    }
+    }**/
 
     private void buildMedicinePopup() {
         VBox container = new VBox(10);

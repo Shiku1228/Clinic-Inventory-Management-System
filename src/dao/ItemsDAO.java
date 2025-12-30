@@ -6,11 +6,15 @@ package dao;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 import database.MongoDBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import models.Items;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class ItemsDAO {
 
@@ -27,6 +31,7 @@ public class ItemsDAO {
         for (Document doc : itemsCollection.find()) {
 
             Items item = new Items(
+                    doc.getObjectId("_id").toHexString(), //MongoID
                     doc.getString("itemId"),
                     doc.getString("name"),
                     doc.get("category", Document.class).getString("categoryName"),
@@ -44,7 +49,7 @@ public class ItemsDAO {
     }
 
     public void addItem(Items item) {
-        Document doc = new Document("itemId", item.getItemID())
+        Document doc = new Document("itemId", generateItemId())
                 .append("name", item.getItemName())
                 .append("category", new Document("categoryName", item.getCategory()))
                 .append("quantityOnHand", item.getStock())
@@ -55,5 +60,35 @@ public class ItemsDAO {
                 .append("imagePath", item.getImagePath());
 
         itemsCollection.insertOne(doc);
+    }
+
+    public void updateItem(Items item) {
+
+        itemsCollection.updateOne(
+                eq("_id", new ObjectId(item.getMongoId())),
+                combine(
+                        set("itemId", item.getItemID()),
+                        set("name", item.getItemName()),
+                        set("category.categoryName", item.getCategory()),
+                        set("quantityOnHand", item.getStock()),
+                        set("unit", item.getUnit()),
+                        set("status", item.getStatus())
+                )
+        );
+    }
+
+    private String generateItemId() {
+        long count = itemsCollection.countDocuments() + 1;
+        return String.format("ITEM-%04d", count);
+    }
+    
+    public void deleteItem(Items item){
+        if (item == null || item.getMongoId() == null){
+            throw new IllegalArgumentException("Item or mongoId is null");
+        }
+        
+        itemsCollection.deleteOne(
+                eq("_id", new ObjectId(item.getMongoId()))
+        );   
     }
 }

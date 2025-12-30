@@ -121,6 +121,7 @@ public class AddItemDialogController implements Initializable {
         try {
             ItemsDAO dao = new ItemsDAO();
             Items newItem = new Items(
+                    null, //id na ginawa ni mongoDb
                     null, //item ID can be genrated automatically of needed
                     itemNameField.getText(),
                     categoryBox.getValue(),

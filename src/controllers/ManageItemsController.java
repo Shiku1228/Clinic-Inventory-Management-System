@@ -1,5 +1,6 @@
 package controllers;
 
+import controllers.UpdateStockDialogController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,7 +26,9 @@ import models.Items;
 import dao.ItemsDAO;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Optional;
 import javafx.beans.binding.Bindings;
+import javafx.scene.Node;
 
 public class ManageItemsController implements Initializable {
 
@@ -161,8 +164,16 @@ public class ManageItemsController implements Initializable {
         //Action Button Placeholders
         addItemBtn.setOnAction(e
                 -> handleAddItem());
-        updateStockBtn.setOnAction(e
-                -> handleUpdateStock());
+
+        updateStockBtn.setOnAction(e -> {
+            Items selected = itemsTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                handleEdit(selected);
+            } else {
+                System.out.println("Please select an item first!");
+            }
+        });
+
         exportDataBtn.setOnAction(e
                 -> System.out.println("Export Data clicked"));
         removeExpiredBtn.setOnAction(e
@@ -262,7 +273,7 @@ public class ManageItemsController implements Initializable {
 
             // ADD BUTTON ACTIONS (you can edit these)
             editBtn.setOnAction(e -> handleEdit(item));
-            deleteBtn.setOnAction(e -> handleDelete(item));
+            deleteBtn.setOnAction(e -> handleDelete(item, card));
             disableBtn.setOnAction(e -> handleDisable(item));
 
             btnRow.getChildren().addAll(editBtn, deleteBtn, disableBtn);
@@ -286,13 +297,67 @@ public class ManageItemsController implements Initializable {
     }
 
     private void handleEdit(Items item) {
-        System.out.println("Edit clicked for: " + item.getItemName());
-        // TODO: open edit dialog
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/UpdateStockDialog.fxml")
+            );
+
+            AnchorPane root = loader.load();
+
+            //pass selected items sa dialog
+            UpdateStockDialogController controller = loader.getController();
+            controller.setItem(item);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit/Update Stock");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(addItemBtn.getScene().getWindow());
+
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+            dialogStage.setResizable(false);
+
+            dialogStage.showAndWait();
+
+            //refresh after update
+            ItemsDAO dao = new ItemsDAO();
+            itemsData = dao.getAllItems();
+            itemsTable.setItems(itemsData);
+            refreshGallery();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void handleDelete(Items item) {
-        System.out.println("Delete clicked for: " + item.getItemName());
-        // TODO: delete confirmation
+    private void handleDelete(Items item, Node itemCard) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Item");
+        alert.setHeaderText("Are you sure you want to delete this item?");
+        alert.setContentText("This item will be deleted.");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        
+        if(result.isPresent() && result.get() == ButtonType.OK){
+            
+            try{
+                ItemsDAO dao = new ItemsDAO();
+                dao.deleteItem(item);
+                
+                //remove from the gallery 
+                galleryPane.getChildren().remove(itemCard);
+                
+                System.out.println("Removed Successfully");
+            }catch (Exception ex){
+                ex.printStackTrace();
+                
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Error");
+                error.setHeaderText("Delete Failed");
+                error.setContentText(ex.getMessage());
+                error.showAndWait();
+            }
+        }
     }
 
     private void handleDisable(Items item) {
@@ -344,26 +409,11 @@ public class ManageItemsController implements Initializable {
 
     @FXML
     private void handleUpdateStock() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/UpdateStockDialog.fxml") // path to your FXML
-            );
-
-            AnchorPane root = loader.load();
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Update Stock");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(updateStockBtn.getScene().getWindow());
-
-            Scene scene = new Scene(root);
-            dialogStage.setScene(scene);
-            dialogStage.setResizable(false);
-
-            dialogStage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        Items selected = itemsTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            handleEdit(selected); // reuse the same edit logic
+        } else {
+            System.out.println("Please select an item first!");
         }
     }
 

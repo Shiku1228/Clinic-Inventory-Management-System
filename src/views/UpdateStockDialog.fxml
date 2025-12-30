@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="520" prefWidth="420" style="-fx-background-radius: 20; -fx-border-radius: 20;" stylesheets="@../resource/additemdialog.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.UpdateStockDialogController">
+<AnchorPane prefHeight="520" prefWidth="420" style="-fx-background-radius: 20; -fx-border-radius: 20;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.UpdateStockDialogController">
 
-    <VBox alignment="CENTER" spacing="15" styleClass="dialog-card" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+    <VBox alignment="CENTER" spacing="15" styleClass="dialog-card" stylesheets="@../resource/updatestockdialog.css" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
 
         <padding>
             <Insets bottom="20" left="20" right="20" top="20" />
@@ -29,7 +29,7 @@
 
             <!-- Item -->
             <Label text="Item Name:" />
-            <ComboBox fx:id="itemBox" prefHeight="25.0" prefWidth="239.0" styleClass="combo-box" GridPane.columnIndex="1" />
+            <TextField fx:id="itemNameField" prefHeight="25.0" prefWidth="239.0" styleClass="combo-box" GridPane.columnIndex="1" />
 
             <!-- Category -->
             <Label text="Category:" GridPane.rowIndex="1" />
@@ -59,8 +59,8 @@
 
         <!-- Buttons -->
         <VBox alignment="CENTER" prefHeight="41.0" prefWidth="360.0" spacing="10">
-            <Button fx:id="updateButton" onAction="#handleUpdate" styleClass="primary-btn" text="UPDATE" />
-            <Button fx:id="cancelButton" onAction="#handleCancel" styleClass="secondary-btn" text="CANCEL" />
+            <Button fx:id="updateButton" onAction="#handleUpdate" prefHeight="25.0" prefWidth="232.0" styleClass="button-submit" text="UPDATE" />
+            <Button fx:id="cancelButton" onAction="#handleCancel" prefHeight="25.0" prefWidth="233.0" styleClass="button-cancel" text="CANCEL" />
         </VBox>
 
     </VBox>

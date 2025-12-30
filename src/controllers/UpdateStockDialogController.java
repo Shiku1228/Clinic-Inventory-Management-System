@@ -1,19 +1,24 @@
 package controllers;
 
+import dao.ItemsDAO;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import models.Items;
 
 public class UpdateStockDialogController implements Initializable {
 
+    private Items selectedItem;
+
     @FXML
-    private ComboBox<String> itemBox;
+    private TextField itemNameField;
 
     @FXML
     private ComboBox<String> categoryBox;
@@ -27,14 +32,6 @@ public class UpdateStockDialogController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // TEMP SAMPLE DATA (replace with DB later)
-        itemBox.setItems(FXCollections.observableArrayList(
-                "Alcohol",
-                "Bandage",
-                "Syringe",
-                "Gloves"
-        ));
-
         categoryBox.setItems(FXCollections.observableArrayList(
                 "Medicine",
                 "Equipment",
@@ -44,56 +41,56 @@ public class UpdateStockDialogController implements Initializable {
         unitBox.setItems(FXCollections.observableArrayList(
                 "Box",
                 "Piece",
-                "Pack"
+                "Pack",
+                "Bottle"
         ));
 
-        // Disable category & unit (auto-filled based on item)
-        categoryBox.setDisable(true);
-        unitBox.setDisable(true);
+        // allow selection
+        categoryBox.setDisable(false);
+        unitBox.setDisable(false);
+    }
 
-        // When item changes, auto-fill category & unit
-        itemBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal == null) return;
+    //called from manage item controller
+    public void setItem(Items item) {
+        this.selectedItem = item;
 
-            switch (newVal) {
-                case "Alcohol" -> {
-                    categoryBox.setValue("Medicine");
-                    unitBox.setValue("Bottle");
-                }
-                case "Bandage" -> {
-                    categoryBox.setValue("Supply");
-                    unitBox.setValue("Pack");
-                }
-                case "Syringe" -> {
-                    categoryBox.setValue("Equipment");
-                    unitBox.setValue("Piece");
-                }
-                case "Gloves" -> {
-                    categoryBox.setValue("Supply");
-                    unitBox.setValue("Box");
-                }
-            }
-        });
+        //prefilling the fields with the selcted item
+        itemNameField.setText(item.getItemName());
+        categoryBox.setValue(item.getCategory());
+        unitBox.setValue(item.getUnit());
+        stockField.setText(String.valueOf(item.getStock()));
+
     }
 
     @FXML
     private void handleUpdate() {
 
-        String item = itemBox.getValue();
+        String itemName = itemNameField.getText();
         String category = categoryBox.getValue();
         String unit = unitBox.getValue();
-        String stock = stockField.getText();
+        String stockText = stockField.getText();
 
-        if (item == null || stock.isEmpty()) {
+        if (itemName == null || itemName.isBlank()) {
             System.out.println("Please complete required fields.");
             return;
         }
 
-        System.out.println("Updating Stock:");
-        System.out.println("Item: " + item);
-        System.out.println("Category: " + category);
-        System.out.println("Unit: " + unit);
-        System.out.println("Stock: " + stock);
+        int stock;
+
+        try {
+            stock = Integer.parseInt(stockText);
+        } catch (NumberFormatException e) {
+            System.out.println("Stock must be a number!");
+            return;
+        }
+
+        selectedItem.setItemName(itemName);
+        selectedItem.setCategory(category);
+        selectedItem.setUnit(unit);
+        selectedItem.setStock(stock);
+
+        ItemsDAO dao = new ItemsDAO();
+        dao.updateItem(selectedItem);
 
         closeDialog();
     }
