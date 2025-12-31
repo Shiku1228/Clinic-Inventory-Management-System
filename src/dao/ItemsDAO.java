@@ -81,14 +81,52 @@ public class ItemsDAO {
         long count = itemsCollection.countDocuments() + 1;
         return String.format("ITEM-%04d", count);
     }
-    
-    public void deleteItem(Items item){
-        if (item == null || item.getMongoId() == null){
+
+    public void deleteItem(Items item) {
+        if (item == null || item.getMongoId() == null) {
             throw new IllegalArgumentException("Item or mongoId is null");
         }
-        
+
         itemsCollection.deleteOne(
                 eq("_id", new ObjectId(item.getMongoId()))
-        );   
+        );
     }
+
+    public void disableItem(Items item) {
+        itemsCollection.updateOne(
+                eq("_id", new ObjectId(item.getMongoId())),
+                set("status", "Disabled")
+        );
+    }
+
+    public void enableItem(Items item) {
+        itemsCollection.updateOne(
+                eq("_id", new ObjectId(item.getMongoId())),
+                set("status", "Availale")
+        );
+    }
+
+    public ObservableList<Items> getActiveItems() {
+        ObservableList<Items> list = FXCollections.observableArrayList();
+
+        for (Document doc : itemsCollection.find(eq("status", "Active"))) {
+
+            Items item = new Items(
+                    doc.getObjectId("_id").toHexString(),
+                    doc.getString("itemId"),
+                    doc.getString("name"),
+                    doc.get("category", Document.class).getString("categoryName"),
+                    doc.getInteger("quantityOnHand"),
+                    doc.getString("unit"),
+                    doc.getString("expiryDate"),
+                    doc.getString("supplier"),
+                    doc.getString("status"),
+                    doc.getString("imagePath")
+            );
+
+            list.add(item);
+        }
+        return list;
+    }
+
 }

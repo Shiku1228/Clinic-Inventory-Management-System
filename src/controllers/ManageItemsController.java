@@ -119,7 +119,19 @@ public class ManageItemsController implements Initializable {
         colUnit.setCellValueFactory(new PropertyValueFactory<>("unit"));
         colExpirationDate.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
         colSupplier.setCellValueFactory(new PropertyValueFactory<>("supplier"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStatus.setCellValueFactory(cellData -> {
+            Items item = cellData.getValue();
+
+            String baseStatus = item.getStatus(); // Active / Disabled
+            String condition = item.getInventoryCondition();
+
+            String finalStatus = baseStatus;
+            if (!condition.equals("Normal")) {
+                finalStatus += " • " + condition;
+            }
+
+            return new javafx.beans.property.SimpleStringProperty(finalStatus);
+        });
 
         itemsTable.setFixedCellSize(28);
         itemsTable.prefHeightProperty().bind(
@@ -135,8 +147,41 @@ public class ManageItemsController implements Initializable {
         itemsData = itemsDAO.getAllItems();
         itemsTable.setItems(itemsData);
 
+        autoDisableExpiredItems();
+
         //Set Table Values
         itemsTable.setItems(itemsData);
+        itemsTable.setRowFactory(tv -> new TableRow<>() {
+
+            @Override
+            protected void updateItem(Items item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else if (item.isExpired()) {
+                    // style in row for expired items 
+                    setStyle(
+                            "-fx-background-color: #8B0000;"
+                            + // deep red
+                            "-fx-text-fill: white;"
+                    );
+                } else if (item.isLowStock()) {
+                    // style in row for low stock items 
+                    setStyle(
+                            "-fx-background-color: #4B0082;"
+                            + // deep purple (indigo)
+                            "-fx-text-fill: white;"
+                    );
+                } else if (item.getStatus().equalsIgnoreCase("Disabled")) {
+                    //faded lang pag disabled
+                    setStyle("-fx-opacity: 0.6;");
+                } else {
+                    setStyle("");
+                }
+            }
+
+        });
 
         //Initialize gallery
         refreshGallery();
@@ -167,11 +212,21 @@ public class ManageItemsController implements Initializable {
 
         updateStockBtn.setOnAction(e -> {
             Items selected = itemsTable.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                handleEdit(selected);
-            } else {
-                System.out.println("Please select an item first!");
+
+            if (selected == null) {
+                showWarning("No Selection", "Please select an item first.");
+                return;
             }
+
+            if (selected.isExpired()) {
+                showWarning(
+                        "Expired Item",
+                        "This item is already expired and cannot be updated."
+                );
+                return;
+            }
+
+            handleEdit(selected);
         });
 
         exportDataBtn.setOnAction(e
@@ -268,19 +323,51 @@ public class ManageItemsController implements Initializable {
             Button deleteBtn = new Button("Delete");
             deleteBtn.getStyleClass().add("delete-btn");
 
-            Button disableBtn = new Button("Disable");
+            Button disableBtn = new Button(
+                    item.getStatus().equalsIgnoreCase("Disabled") ? "Enable" : "Disable"
+            );
+
             disableBtn.getStyleClass().add("disable-btn");
 
+            disableBtn.setOnAction(e -> handleDisableToggle(item));
+
+            // Reset first (important when refreshing)
+            card.getStyleClass().removeAll(
+                    "expired-card",
+                    "lowstock-card",
+                    "disabled-card"
+            );
+            card.setOpacity(1);
+
+            // sequence toh siya for styling ng cards: Expired > Low Stock > Disabled
+            if (item.getStatus().equalsIgnoreCase("Disabled")) {
+                card.getStyleClass().add("disabled-card");
+            }
+
+            if (item.isExpired()) {
+                card.getStyleClass().add("expired-card");
+            } else if (item.isLowStock()) {
+                card.getStyleClass().add("lowstock-card");
+            }
+
+            if (item.isExpired()) {
+                editBtn.setDisable(true);
+                deleteBtn.setDisable(false);
+                disableBtn.setDisable(true);
+            }
+
             // ADD BUTTON ACTIONS (you can edit these)
+            editBtn.setDisable(item.getStatus().equalsIgnoreCase("Disabled"));
             editBtn.setOnAction(e -> handleEdit(item));
             deleteBtn.setOnAction(e -> handleDelete(item, card));
-            disableBtn.setOnAction(e -> handleDisable(item));
+            disableBtn.setOnAction(e -> handleDisableToggle(item));
 
             btnRow.getChildren().addAll(editBtn, deleteBtn, disableBtn);
 
             // FINAL CARD ASSEMBLY
             card.getChildren().addAll(img, name, category, btnRow);
             galleryPane.getChildren().add(card);
+
         }
     }
 
@@ -288,7 +375,9 @@ public class ManageItemsController implements Initializable {
         int totalMedicines = (int) itemsData.stream().filter(i -> i.getCategory().equalsIgnoreCase("Medicine")).count();
         int totalSupplies = (int) itemsData.stream().filter(i -> i.getCategory().equalsIgnoreCase("Supplies")).count();
         int totalEquipments = (int) itemsData.stream().filter(i -> i.getCategory().equalsIgnoreCase("Equipment")).count();
-        int lowStocks = (int) itemsData.stream().filter(i -> i.getStock() < 10).count();
+        int lowStocks = (int) itemsData.stream()
+                .filter(i -> i.isLowStock() && !i.isExpired())
+                .count();
 
         totalMedicinesLabel.setText(String.valueOf(totalMedicines));
         totalSuppliesLabel.setText(String.valueOf(totalSupplies));
@@ -330,27 +419,32 @@ public class ManageItemsController implements Initializable {
         }
     }
 
+    //de;ete items
     private void handleDelete(Items item, Node itemCard) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Item");
-        alert.setHeaderText("Are you sure you want to delete this item?");
+        alert.setHeaderText(
+                item.isExpired()
+                ? "Delete expired item?"
+                : "Are you sure you want to delete this item?"
+        );
         alert.setContentText("This item will be deleted.");
-        
+
         Optional<ButtonType> result = alert.showAndWait();
-        
-        if(result.isPresent() && result.get() == ButtonType.OK){
-            
-            try{
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+
+            try {
                 ItemsDAO dao = new ItemsDAO();
                 dao.deleteItem(item);
-                
+
                 //remove from the gallery 
                 galleryPane.getChildren().remove(itemCard);
-                
+
                 System.out.println("Removed Successfully");
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
-                
+
                 Alert error = new Alert(Alert.AlertType.ERROR);
                 error.setTitle("Error");
                 error.setHeaderText("Delete Failed");
@@ -360,9 +454,45 @@ public class ManageItemsController implements Initializable {
         }
     }
 
-    private void handleDisable(Items item) {
-        System.out.println("Disable clicked for: " + item.getItemName());
-        // TODO: change status to disabled
+    //diable ng mga item
+    private void handleDisableToggle(Items item) {
+
+        boolean isDisabled = item.getStatus().equalsIgnoreCase("Disabled");
+
+        if (item.isExpired()) {
+            showWarning(
+                    "Expired Item",
+                    "Expired items cannot be enabled or modified. You may only delete them."
+            );
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(isDisabled ? "Enable Items" : "Diable Items");
+        alert.setHeaderText(isDisabled ? "Enable this item?" : "Are you sure you want to disable this item?");
+        alert.setContentText(isDisabled ? "This item will be available again." : "This item will be disabled and connot be used until enabled again.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                ItemsDAO dao = new ItemsDAO();
+
+                if (isDisabled) {
+                    dao.enableItem(item);
+                    item.setStatus("Active");
+                } else {
+                    dao.disableItem(item);
+                    item.setStatus("Disabled");
+                }
+
+                itemsTable.refresh();
+                refreshGallery();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void handleSummaryClick(String category) {
@@ -434,4 +564,30 @@ public class ManageItemsController implements Initializable {
             return null;
         }
     }
+
+    //for warnings/alerts
+    private void showWarning(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    //auto disable mga expired
+    private void autoDisableExpiredItems() {
+        ItemsDAO dao = new ItemsDAO();
+
+        for (Items item : itemsData) {
+            if (item.isExpired() && item.getStatus().equalsIgnoreCase("Active")) {
+                try {
+                    dao.disableItem(item);
+                    item.setStatus("Disabled");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }

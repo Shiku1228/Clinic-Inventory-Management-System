@@ -251,6 +251,10 @@
     -fx-alignment: center;
 }
 
+.disabled-card {
+    -fx-background-color: #dddddd;
+}
+
 .edit-btn, .delete-btn, .disable-btn {
     -fx-background-radius: 8px;
     -fx-padding: 6 12;
@@ -275,3 +279,49 @@
 .edit-btn:hover, .delete-btn:hover, .disable-btn:hover {
     -fx-opacity: 0.8;
 }
+
+/* Disabled card */
+.disabled-card {
+    -fx-background-color: #b0b0b0;
+    -fx-opacity: 0.5;
+}
+
+/* Expired card */
+.expired-card {
+    -fx-background-color: #8B0000; /* deep red */
+    -fx-text-fill: white;
+}
+
+.expired-card .item-name,
+.expired-card .item-category {
+    -fx-text-fill: white;
+}
+
+/* Low stock card */
+.lowstock-card {
+    -fx-background-color: #4B0082; /* deep purple */
+    -fx-text-fill: white;
+}
+
+.lowstock-card .item-name,
+.lowstock-card .item-category {
+    -fx-text-fill: white;
+}
+
+/* Hover effects */
+.gallery-card:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 0, 4);
+}
+
+.expired-card:hover {
+    -fx-background-color: #a60000; /* slightly brighter red */
+}
+
+.lowstock-card:hover {
+    -fx-background-color: #5a008c; /* slightly brighter purple */
+}
+
+

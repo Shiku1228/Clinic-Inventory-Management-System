@@ -1,13 +1,17 @@
 package models;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Items {
 
     private String itemID, itemName, category, unit, expiryDate, supplier, status, imagePath;
     private int stock;
     private String mongoId;
+    private static final int LOW_STOCK_THRESHOLD = 10;
 
     public Items(String mongoId, String itemID, String itemName, String category, int stock, String unit, String expiryDate, String supplier, String status, String imagePath) {
-        this.mongoId = mongoId; 
+        this.mongoId = mongoId;
         this.itemID = itemID;
         this.itemName = itemName;
         this.category = category;
@@ -90,5 +94,34 @@ public class Items {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+    //check if item is low stock na
+    public boolean isExpired() {
+        if (expiryDate == null || expiryDate.isBlank()) {
+            return false;
+        }
+
+        try {
+            LocalDate exp = LocalDate.parse(expiryDate, DateTimeFormatter.ISO_LOCAL_DATE);
+            return exp.isBefore(LocalDate.now());
+        } catch (Exception e) {
+            return false; // safe fallback
+        }
+    }
+
+// Check if low stock
+    public boolean isLowStock() {
+        return stock > 0 && stock <= LOW_STOCK_THRESHOLD;
+    }
+
+// Inventory condition label
+    public String getInventoryCondition() {
+        if (isExpired()) {
+            return "Expired";
+        }
+        if (isLowStock()) {
+            return "Low Stock";
+        }
+        return "Normal";
     }
 }

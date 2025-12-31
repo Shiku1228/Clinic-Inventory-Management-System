@@ -93,7 +93,8 @@ public class AddItemDialogController implements Initializable {
         statusBox.getItems().addAll(
                 "Available",
                 "Low Stock",
-                "Out of Stock"
+                "Out of Stock",
+                "Expired"
         );
     }
 
