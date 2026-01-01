@@ -151,4 +151,12 @@ public class ItemsDAO {
         }
     }
 
+    // Decrease stock method
+    public void decreaseStock(String itemId, int quantity) {
+        ObjectId objectId = new ObjectId(itemId);
+        itemsCollection.updateOne(
+                new Document("_id", objectId),
+                new Document("$inc", new Document("quantityOnHand", -quantity))
+        );
+    }
 }

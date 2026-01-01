@@ -1,9 +1,12 @@
 package models;
 
 import javafx.beans.property.*;
+import org.bson.types.ObjectId;
 
 public class Transactions {
-
+    
+    private ObjectId id;
+    
     private final StringProperty date;
     private final StringProperty itemName;
     private final StringProperty type;
@@ -20,6 +23,14 @@ public class Transactions {
         this.remarks = new SimpleStringProperty(remarks);
     }
 
+    public ObjectId getId(){
+        return id;
+    }
+    
+    public void setId(ObjectId id){
+        this.id = id;
+    }
+    
     public StringProperty dateProperty() {
         return date;
     }
@@ -43,5 +54,14 @@ public class Transactions {
     public StringProperty remarksProperty() {
         return remarks;
     }
+    
+    //getting the raw values
+    public String getDate() { return date.get(); }
+    public String getItemName() { return itemName.get(); }
+    public String getType() { return type.get(); }
+    public int getQuantity() { return quantity.get(); }
+    public String getPerformedBy() { return performedBy.get(); }
+    public String getRemarks() { return remarks.get(); }
+    
 }
 

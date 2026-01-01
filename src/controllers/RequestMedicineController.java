@@ -1,5 +1,7 @@
 package controllers;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,11 @@ import javafx.event.ActionEvent;
 import models.Items;
 import org.bson.Document;
 import dao.ItemsDAO;
+import dao.TransactionsDAO;
+import database.MongoDBConnection;
 import java.io.File;
 import java.io.InputStream;
+import models.Transactions;
 
 public class RequestMedicineController implements Initializable {
 
@@ -49,6 +54,10 @@ public class RequestMedicineController implements Initializable {
     //medicines from teh database
     private List<Items> medicines = new ArrayList<>();
 
+    //submission sa database
+    private TransactionsDAO transactionsDAO;
+    private MongoDatabase database;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         quantityField.setText("1"); //default quantity for the medicine
@@ -74,6 +83,8 @@ public class RequestMedicineController implements Initializable {
                 medicinePopup.hide();
             }
         });
+        
+        transactionsDAO = new TransactionsDAO(MongoDBConnection.getDatabase());
     }
 
     // Functioning of the quantity buttons
@@ -183,15 +194,14 @@ public class RequestMedicineController implements Initializable {
 
     //Form Submission and Validation
     @FXML
-    private void handleSubmitRequest(ActionEvent event
-    ) {
+    private void handleSubmitRequest(ActionEvent event) {
         String medicineName = medicineNameField.getText().trim();
-        String quantity = quantityField.getText().trim();
+        String quantityStr = quantityField.getText().trim();
         String requestedBy = requestedByField.getText().trim();
         String requestedFrom = requestedFromField.getText().trim();
         String remarks = remarksArea.getText().trim();
 
-        if (medicineName.isEmpty() || quantity.isEmpty()
+        if (medicineName.isEmpty() || quantityStr.isEmpty()
                 || requestedBy.isEmpty() || requesterIdField.getText().isEmpty()) {
 
             showAlert(Alert.AlertType.WARNING,
@@ -200,16 +210,47 @@ public class RequestMedicineController implements Initializable {
             return;
         }
 
-        // For now, just simulate saving to a database
-        System.out.println("Medicine Requested:");
-        System.out.println("Name: " + medicineName);
-        System.out.println("Quantity: " + quantity);
-        System.out.println("Requested By: " + requestedBy);
-        System.out.println("Requested From: " + requestedFrom);
-        System.out.println("Remarks: " + remarks);
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Please eneter a valid number for quantity!");
+            return;
+        }
 
-        showAlert(Alert.AlertType.INFORMATION, "Request Sent", "Medicine request submitted successfully!");
-        clearForm();
+        //get selected items object if available
+        Items selectedItem = (Items) medicineNameField.getUserData();
+
+        if (selectedItem == null) {
+            showAlert(Alert.AlertType.WARNING, "Invalid Selection", "Please select a valid medicine from the list.");
+            return;
+        }
+
+        try {
+            // create transaction object
+            Transactions transaction = new Transactions(       
+                    java.time.LocalDateTime.now().toString(),
+                    selectedItem.getItemName(),
+                    "Issued",
+                    -quantity,
+                    requestedBy,
+                    remarks
+            );
+
+            // Save to MongoDB
+            transactionsDAO.addTransaction(transaction);
+
+            // Optional: reduce stock in Items collection
+            itemsDAO.decreaseStock(selectedItem.getMongoId(), quantity);
+
+            showAlert(Alert.AlertType.INFORMATION, "Request Sent", "Medicine request submitted successfully!");
+
+            clearForm();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to submit the medicine request.");
+        }
     }
 
     @FXML
@@ -238,8 +279,8 @@ public class RequestMedicineController implements Initializable {
         medicines.clear();
         medicines.addAll(itemsDAO.getActiveItems());
 
-        var db = database.MongoDBConnection.getDatabase();
-        var collection = db.getCollection("Items Collection");
+        MongoDatabase db = MongoDBConnection.getDatabase();
+        MongoCollection<Document> collection = db.getCollection("Items Collection");
 
         for (var doc : collection.find()) {
 
@@ -259,7 +300,7 @@ public class RequestMedicineController implements Initializable {
                     doc.getInteger("quantityOnHand", 0),
                     doc.getString("unit"),
                     doc.getString("expiryDate"),
-                    doc.getString("supplier"),
+                    doc.getString("supplier"),  
                     status,
                     doc.getString("imagePath")
             );

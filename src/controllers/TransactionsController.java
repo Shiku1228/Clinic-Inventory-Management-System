@@ -2,6 +2,7 @@ package controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleStringProperty;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +14,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import dao.TransactionsDAO;
+import com.mongodb.client.MongoDatabase;
+import database.MongoDBConnection;
 
 import models.Transactions;
 
@@ -26,6 +31,8 @@ public class TransactionsController implements Initializable {
 
     @FXML
     private TableColumn<Transactions, String> colDate;
+    @FXML
+    private TableColumn<Transactions, String> colTransactionID;
     @FXML
     private TableColumn<Transactions, String> colItem;
     @FXML
@@ -53,14 +60,28 @@ public class TransactionsController implements Initializable {
     private final ObservableList<Transactions> transactionList
             = FXCollections.observableArrayList();
 
+    private TransactionsDAO transactionsDAO;
+    private MongoDatabase database;
+
     /* =========================
        INITIALIZE
        ========================= */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        //for the database
+        database = MongoDBConnection.getDatabase();
+        transactionsDAO = new TransactionsDAO(database);
+        loadTransactionsFromDB();
+        
         // Bind table columns to model
         colDate.setCellValueFactory(data -> data.getValue().dateProperty());
+        colTransactionID.setCellValueFactory(data -> {
+            if (data.getValue().getId() != null) {
+                return new SimpleStringProperty(data.getValue().getId().toHexString());
+            } else {
+                return new SimpleStringProperty("N/A");
+            }
+        });
         colItem.setCellValueFactory(data -> data.getValue().itemNameProperty());
         colType.setCellValueFactory(data -> data.getValue().typeProperty());
         colQuantity.setCellValueFactory(
@@ -81,9 +102,6 @@ public class TransactionsController implements Initializable {
         );
         filterCombo.getSelectionModel().selectFirst();
 
-        // Load sample data (temporary)
-        loadSampleTransactions();
-
         transactionTable.setItems(transactionList);
         transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -100,37 +118,6 @@ public class TransactionsController implements Initializable {
         });
     }
 
-    /* =========================
-       SAMPLE DATA
-       ========================= */
-    private void loadSampleTransactions() {
-        transactionList.addAll(
-                new Transactions(
-                        "2025-11-14 10:21 AM",
-                        "Paracetamol",
-                        "Issued",
-                        -5,
-                        "Nurse Anna",
-                        "Request #102"
-                ),
-                new Transactions(
-                        "2025-11-14 09:32 AM",
-                        "Alcohol",
-                        "Received",
-                        50,
-                        "Admin Juan",
-                        "Delivered by RMMC"
-                ),
-                new Transactions(
-                        "2025-11-13 07:50 AM",
-                        "Betadine",
-                        "Expired",
-                        -2,
-                        "System Notification",
-                        "Auto Expiry"
-                )
-        );
-    }
 
     /* =========================
        ACTION HANDLERS
@@ -143,8 +130,7 @@ public class TransactionsController implements Initializable {
 
     @FXML
     private void handleRefresh() {
-        System.out.println("Refresh clicked");
-        // TODO: Reload from database
+        loadTransactionsFromDB();
     }
 
     @FXML
@@ -209,4 +195,22 @@ public class TransactionsController implements Initializable {
         }
     }
 
+    private void loadTransactionsFromDB() {
+        transactionList.clear();
+
+        try {
+            transactionList.addAll(transactionsDAO.getAllTransactions());
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Database Error", "Failed to load transactions.");
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);  
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

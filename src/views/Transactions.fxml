@@ -66,6 +66,7 @@
             <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colDate" prefWidth="150" text="Date and Time"/>
+                    <TableColumn fx:id="colTransactionID" prefWidth="150" text="Transaction ID"/>
                     <TableColumn fx:id="colItem" prefWidth="150" text="Item Name"/>
                     <TableColumn fx:id="colType" prefWidth="100" text="Type"/>
                     <TableColumn fx:id="colQuantity" prefWidth="80" text="Quantity"/>
