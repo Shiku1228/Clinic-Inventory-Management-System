@@ -20,12 +20,16 @@
 
             <!-- Page Title -->
             <Label text="Request Medicine" styleClass="page-header">
-                <font><Font size="26" /></font>
+                <font>
+                    <Font size="26" />
+                </font>
             </Label>
 
             <!-- Card (Responsive) -->
             <VBox styleClass="card" spacing="18" maxWidth="820">
-                <padding><Insets top="20" bottom="20" left="20" right="20"/></padding>
+                <padding>
+                    <Insets top="20" bottom="20" left="20" right="20"/>
+                </padding>
 
                 <!-- FORM GRID -->
                 <GridPane hgap="20" vgap="16" styleClass="form-grid">
@@ -61,30 +65,28 @@
                     <!-- Requested By -->
                     <Label text="Requested By:" styleClass="form-label"
                            GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-
                     <TextField fx:id="requestedByField"
-                               promptText="Enter requester name..."
-                               styleClass="input-field"
                                GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <!-- Requester ID -->
+                    <Label text="Requester ID:" styleClass="form-label"
+                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="requesterIdField"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
                     <!-- Requested From -->
                     <Label text="Requested From:" styleClass="form-label"
-                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-
+                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                     <TextField fx:id="requestedFromField"
-                               promptText="Your department or username..."
-                               styleClass="input-field"
-                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
                     <!-- Remarks -->
                     <Label text="Remarks:" styleClass="form-label"
-                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-
+                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
                     <TextArea fx:id="remarksArea"
-                              promptText="Add notes (optional)"
-                              prefRowCount="4"
-                              styleClass="text-area"
-                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                              GridPane.rowIndex="5" GridPane.columnIndex="1"
+                              prefRowCount="4"/>
+
                 </GridPane>
 
                 <!-- BUTTONS -->

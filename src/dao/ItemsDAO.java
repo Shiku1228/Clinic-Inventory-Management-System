@@ -10,8 +10,10 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import database.MongoDBConnection;
+import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
 import models.Items;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -102,7 +104,7 @@ public class ItemsDAO {
     public void enableItem(Items item) {
         itemsCollection.updateOne(
                 eq("_id", new ObjectId(item.getMongoId())),
-                set("status", "Availale")
+                set("status", "Available")
         );
     }
 
@@ -127,6 +129,26 @@ public class ItemsDAO {
             list.add(item);
         }
         return list;
+    }
+
+    public Image getItemImage(Items item) {
+        try {
+            // Get only the filename, in case DB has a full path
+            String filename = new File(item.getImagePath()).getName();
+
+            // Look for the image in your src/resource/medImages folder
+            File imgFile = new File("src/resource/medImages/" + filename);
+
+            if (imgFile.exists()) {
+                return new Image(imgFile.toURI().toString());
+            } else {
+                System.out.println("⚠ Image not found for item " + item.getItemName() + ", using placeholder.");
+                return new Image(new File("src/resource/medImages/placeholder.png").toURI().toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Image("https://via.placeholder.com/50"); // fail-safe
+        }
     }
 
 }

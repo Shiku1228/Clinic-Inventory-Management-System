@@ -16,6 +16,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Popup;
 import javafx.event.ActionEvent;
+import models.Items;
+import org.bson.Document;
+import dao.ItemsDAO;
+import java.io.File;
+import java.io.InputStream;
 
 public class RequestMedicineController implements Initializable {
 
@@ -28,27 +33,40 @@ public class RequestMedicineController implements Initializable {
     @FXML
     private TextField requestedFromField;
     @FXML
+    private TextField requesterIdField;
+    @FXML
     private TextArea remarksArea;
     @FXML
     private Button btnSubmitRequest;
     @FXML
     private Button btnClear;
 
+    private final ItemsDAO itemsDAO = new ItemsDAO();
+
     //for popup feature of select medecine
     private Popup medicinePopup = new Popup();
 
-    // SAmple data for the medicines
-    private List<Medicine> medicines = new ArrayList<>();
+    //medicines from teh database
+    private List<Items> medicines = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         quantityField.setText("1"); //default quantity for the medicine
 
-        //loadSampleMedicines();
+        //load the medicines from the database
+        loadAvailableMedicines();
         buildMedicinePopup();
 
         //Show popup when clicked the textfield
-        medicineNameField.setOnMouseClicked(e -> showMedicinePopup());
+        medicineNameField.setOnMouseClicked(e -> {
+            if (medicines.isEmpty()) {
+                showAlert(Alert.AlertType.INFORMATION,
+                        "No Medicines Available",
+                        "Please add items first in Manage Items.");
+                return;
+            }
+            showMedicinePopup();
+        });
 
         //HIde the popup
         medicineNameField.focusedProperty().addListener((obs, oldV, newV) -> {
@@ -81,66 +99,59 @@ public class RequestMedicineController implements Initializable {
         }
     }
 
-    //Popup Gallery for Medicines
-    // ===============================
-// POPUP MEDICINE SELECTOR
-// ===============================
-    //Popup Gallery for Medicines 
-    /**private void loadSampleMedicines() {
-        medicines.add(new Medicine("Biogesic", "For headache and fever", "/resource/medImages/biogesic.jpg"));
-        medicines.add(new Medicine("Neozep", "For colds and flu", "/resource/medImages/neozep.jpg"));
-        medicines.add(new Medicine("Alaxan Fr", "Muscle Pain reliever", "/resource/medImages/alaxan.jpg"));
-        medicines.add(new Medicine("Decolgen", "Sinus, allergies, & flu relief", "/resource/medImages/decolgen.jpg"));
-    }**/
-
     private void buildMedicinePopup() {
         VBox container = new VBox(10);
         container.setPadding(new Insets(10));
         container.setStyle("-fx-background-color: white; -fx-background-radius: 12;");
 
-        for (Medicine med : medicines) {
+        for (Items med : medicines) {
             HBox card = createMedicineCard(med);
             container.getChildren().add(card);
         }
 
         ScrollPane scroll = new ScrollPane(container);
-        scroll.setPrefSize(280, 260);
+        scroll.setPrefSize(320, 220);
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background: white; -fx-background-radius: 12;");
 
         medicinePopup.getContent().clear();
         medicinePopup.getContent().add(scroll);
+        medicinePopup.setAutoFix(true);
+        medicinePopup.setAutoHide(true);
+        medicinePopup.setHideOnEscape(true);
 
         // --- Auto-hide when clicking outside ---
         scroll.setOnMouseClicked(e -> e.consume());
     }
 
-    private HBox createMedicineCard(Medicine med) {
+    private HBox createMedicineCard(Items item) {
         HBox card = new HBox(10);
         card.setPadding(new Insets(10));
         card.setStyle("-fx-background-color: #F0F0F0; -fx-background-radius: 8; -fx-cursor: hand;");
 
-        // Load image correctly from classpath
-        Image img = new Image(getClass().getResourceAsStream(med.imagePath));
+        // ✅ Load image via DAO
+        Image image = itemsDAO.getItemImage(item);
 
-        ImageView imgView = new ImageView(img);
+        ImageView imgView = new ImageView(image);
         imgView.setFitWidth(50);
         imgView.setFitHeight(50);
+        imgView.setPreserveRatio(true);
+        imgView.setSmooth(true);
+        imgView.setCache(true);
 
-        Label nameLabel = new Label(med.name);
+        Label nameLabel = new Label(item.getItemName());
         nameLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
 
-        Label infoLabel = new Label(med.info);
+        Label infoLabel = new Label("Stock: " + item.getStock() + " • " + item.getUnit());
         infoLabel.setStyle("-fx-font-size: 11px;");
-        infoLabel.setWrapText(true);
 
         VBox labels = new VBox(3, nameLabel, infoLabel);
 
         card.getChildren().addAll(imgView, labels);
 
-        // Clicking a card inserts text and hides popup
         card.setOnMouseClicked(e -> {
-            medicineNameField.setText(med.name);
+            medicineNameField.setText(item.getItemName());
+            medicineNameField.setUserData(item);
             medicinePopup.hide();
         });
 
@@ -152,7 +163,7 @@ public class RequestMedicineController implements Initializable {
             medicinePopup.show(medicineNameField.getScene().getWindow());
 
             double x = medicineNameField.localToScreen(0, 0).getX();
-            double y = medicineNameField.localToScreen(0, 0).getY() + medicineNameField.getHeight();
+            double y = medicineNameField.localToScreen(0, 0).getY() + medicineNameField.getHeight() + 6;
 
             medicinePopup.setX(x);
             medicinePopup.setY(y);
@@ -180,8 +191,12 @@ public class RequestMedicineController implements Initializable {
         String requestedFrom = requestedFromField.getText().trim();
         String remarks = remarksArea.getText().trim();
 
-        if (medicineName.isEmpty() || quantity.isEmpty() || requestedBy.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill out all required fields.");
+        if (medicineName.isEmpty() || quantity.isEmpty()
+                || requestedBy.isEmpty() || requesterIdField.getText().isEmpty()) {
+
+            showAlert(Alert.AlertType.WARNING,
+                    "Incomplete Information",
+                    "Please fill out all required fields including Requester ID.");
             return;
         }
 
@@ -219,17 +234,36 @@ public class RequestMedicineController implements Initializable {
         alert.showAndWait();
     }
 
-    //Internal class for medicine data
-    class Medicine {
+    private void loadAvailableMedicines() {
+        medicines.clear();
+        medicines.addAll(itemsDAO.getActiveItems());
 
-        String name;
-        String info;
-        String imagePath;
+        var db = database.MongoDBConnection.getDatabase();
+        var collection = db.getCollection("Items Collection");
 
-        Medicine(String name, String info, String imagePath) {
-            this.name = name;
-            this.info = info;
-            this.imagePath = imagePath;
+        for (var doc : collection.find()) {
+
+            String status = doc.getString("status");
+
+            //filter here the status 
+            if (!"Available".equalsIgnoreCase(status)) {
+                continue;
+            }
+
+            Items item = new Items(
+                    doc.getObjectId("_id").toHexString(),
+                    doc.getString("itemId"),
+                    doc.getString("name"),
+                    doc.get("category", Document.class)
+                            .getString("categoryName"),
+                    doc.getInteger("quantityOnHand", 0),
+                    doc.getString("unit"),
+                    doc.getString("expiryDate"),
+                    doc.getString("supplier"),
+                    status,
+                    doc.getString("imagePath")
+            );
+            medicines.add(item);
         }
     }
 }
