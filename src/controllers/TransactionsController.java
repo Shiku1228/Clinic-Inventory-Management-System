@@ -72,16 +72,13 @@ public class TransactionsController implements Initializable {
         database = MongoDBConnection.getDatabase();
         transactionsDAO = new TransactionsDAO(database);
         loadTransactionsFromDB();
-        
+
         // Bind table columns to model
         colDate.setCellValueFactory(data -> data.getValue().dateProperty());
-        colTransactionID.setCellValueFactory(data -> {
-            if (data.getValue().getId() != null) {
-                return new SimpleStringProperty(data.getValue().getId().toHexString());
-            } else {
-                return new SimpleStringProperty("N/A");
-            }
-        });
+        colTransactionID.setCellValueFactory(
+                data -> data.getValue().transactionIdProperty()
+        );
+
         colItem.setCellValueFactory(data -> data.getValue().itemNameProperty());
         colType.setCellValueFactory(data -> data.getValue().typeProperty());
         colQuantity.setCellValueFactory(
@@ -209,7 +206,7 @@ public class TransactionsController implements Initializable {
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
-        alert.setHeaderText(null);  
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }

@@ -21,16 +21,17 @@ public class TransactionsDAO {
     public TransactionsDAO(MongoDatabase db) {
         collection = db.getCollection("Transactions Collection");
     }
-    
+
     public List<Transactions> getAllTransactions() {
         List<Transactions> list = new ArrayList<>();
 
         for (Document doc : collection.find().sort(descending("transactionDate"))) {
             Transactions t = new Transactions(
-                    doc.getString("transactionDate"),
+                    doc.getString("transactionId"),
+                    doc.getString("date"),
                     doc.getString("itemName"),
                     doc.getString("type"),
-                    doc.getInteger("quantity"),
+                    doc.getInteger("quantity", 0),
                     doc.getString("performedBy"),
                     doc.getString("remarks")
             );
@@ -41,41 +42,45 @@ public class TransactionsDAO {
         return list;
     }
 
-    public boolean addTransaction(Transactions t) {
-        try {
-            Document doc = new Document("transactionDate", t.dateProperty().get())
-                    .append("itemName", t.itemNameProperty().get())
-                    .append("type", t.typeProperty().get())
-                    .append("quantity", t.quantityProperty().get())
-                    .append("performedBy", t.performedByProperty().get())
-                    .append("remarks", t.remarksProperty().get());
+    public void addTransaction(Transactions transaction) {
 
-            collection.insertOne(doc);
+        String newTransactionId = generateNextTransactionId();
 
-            t.setId(doc.getObjectId("_id")); // set ID after insert
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        Document doc = new Document("transactionId", newTransactionId)
+                .append("date", transaction.getDate())
+                .append("itemName", transaction.getItemName())
+                .append("type", transaction.getType())
+                .append("quantity", transaction.getQuantity())
+                .append("performedBy", transaction.getPerformedBy())
+                .append("remarks", transaction.getRemarks());
+
+        collection.insertOne(doc);
     }
-    
+
     public List<Transactions> getTransactionsByFilter(String type) {
         List<Transactions> list = new ArrayList<>();
 
         for (Document doc : collection.find(new Document("type", type)).sort(descending("transactionDate"))) {
             Transactions t = new Transactions(
-                    doc.getString("transactionDate"),
+                    doc.getString("transactionId"),
+                    doc.getString("date"),
                     doc.getString("itemName"),
                     doc.getString("type"),
-                    doc.getInteger("quantity"),
+                    doc.getInteger("quantity", 0),
                     doc.getString("performedBy"),
                     doc.getString("remarks")
             );
-            t.setId(doc.getObjectId("_id"));
+
+            t.setId(doc.getObjectId("_id")); // set MongoDB _id for Transaction ID column
             list.add(t);
         }
 
         return list;
     }
+
+    public String generateNextTransactionId() {
+        long count = collection.countDocuments();
+        return String.format("TRX-%03d", count + 1);
+    }
+
 }

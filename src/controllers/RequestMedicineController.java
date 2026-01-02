@@ -25,6 +25,7 @@ import dao.TransactionsDAO;
 import database.MongoDBConnection;
 import java.io.File;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import models.Transactions;
 
 public class RequestMedicineController implements Initializable {
@@ -83,7 +84,7 @@ public class RequestMedicineController implements Initializable {
                 medicinePopup.hide();
             }
         });
-        
+
         transactionsDAO = new TransactionsDAO(MongoDBConnection.getDatabase());
     }
 
@@ -228,11 +229,14 @@ public class RequestMedicineController implements Initializable {
 
         try {
             // create transaction object
-            Transactions transaction = new Transactions(       
-                    java.time.LocalDateTime.now().toString(),
-                    selectedItem.getItemName(),
-                    "Issued",
-                    -quantity,
+            String transactionId = transactionsDAO.generateNextTransactionId();
+
+            Transactions transaction = new Transactions(
+                    transactionId,
+                    LocalDateTime.now().toString(),
+                    medicineName,
+                    "REQUEST",
+                    quantity,
                     requestedBy,
                     remarks
             );
@@ -300,7 +304,7 @@ public class RequestMedicineController implements Initializable {
                     doc.getInteger("quantityOnHand", 0),
                     doc.getString("unit"),
                     doc.getString("expiryDate"),
-                    doc.getString("supplier"),  
+                    doc.getString("supplier"),
                     status,
                     doc.getString("imagePath")
             );
