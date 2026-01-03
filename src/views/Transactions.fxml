@@ -32,22 +32,26 @@
         <!-- Summary Cards -->
         <HBox spacing="20">
             <VBox styleClass="stat-card">
-                <Label styleClass="stat-number" text="48"/>
+                <Label fx:id="lblTotalToday" styleClass="stat-number"/>
                 <Label text="Total Transactions Today"/>
             </VBox>
+
             <VBox styleClass="stat-card">
-                <Label styleClass="stat-number" text="120"/>
+                <Label fx:id="lblItemsReceived" styleClass="stat-number"/>
                 <Label text="Items Received"/>
             </VBox>
+
             <VBox styleClass="stat-card">
-                <Label styleClass="stat-number" text="85"/>
+                <Label fx:id="lblItemsIssued" styleClass="stat-number"/>
                 <Label text="Items Issued"/>
             </VBox>
+
             <VBox styleClass="stat-card">
-                <Label styleClass="stat-number" text="3"/>
+                <Label fx:id="lblExpiredItems" styleClass="stat-number"/>
                 <Label text="Expired Items"/>
             </VBox>
         </HBox>
+
 
         <!-- Search Bar -->
         <HBox alignment="CENTER_LEFT" spacing="10">

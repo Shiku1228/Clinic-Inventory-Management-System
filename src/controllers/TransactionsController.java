@@ -45,6 +45,14 @@ public class TransactionsController implements Initializable {
     private TableColumn<Transactions, String> colRemarks;
     @FXML
     private TableColumn<Transactions, Void> colAction;
+    @FXML
+    private Label lblTotalToday;
+    @FXML
+    private Label lblItemsReceived;
+    @FXML
+    private Label lblItemsIssued;
+    @FXML
+    private Label lblExpiredItems;
 
     /* =========================
        CONTROLS
@@ -71,8 +79,9 @@ public class TransactionsController implements Initializable {
         //for the database
         database = MongoDBConnection.getDatabase();
         transactionsDAO = new TransactionsDAO(database);
-        loadTransactionsFromDB();
+       
 
+        //load the data in card in right way
         // Bind table columns to model
         colDate.setCellValueFactory(data -> data.getValue().dateProperty());
         colTransactionID.setCellValueFactory(
@@ -94,16 +103,21 @@ public class TransactionsController implements Initializable {
         // Filter options
         filterCombo.getItems().addAll(
                 "Today",
+                "This Week",
                 "Last Week",
                 "Last Month"
         );
         filterCombo.getSelectionModel().selectFirst();
+        filterCombo.setOnAction(e -> applyFilter());
+        
+        applyFilter();
 
         transactionTable.setItems(transactionList);
         transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         addViewButtonToTable();
 
+        //row double click
         transactionTable.setRowFactory(tv -> {
             TableRow<Transactions> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -125,9 +139,9 @@ public class TransactionsController implements Initializable {
         // TODO: Open Add Transaction modal
     }
 
-    @FXML
+     @FXML
     private void handleRefresh() {
-        loadTransactionsFromDB();
+        applyFilter();
     }
 
     @FXML
@@ -197,6 +211,7 @@ public class TransactionsController implements Initializable {
 
         try {
             transactionList.addAll(transactionsDAO.getAllTransactions());
+            loadSummaryCards();
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Database Error", "Failed to load transactions.");
@@ -210,4 +225,59 @@ public class TransactionsController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    private void loadSummaryCards() {
+        lblTotalToday.setText(
+                String.valueOf(transactionsDAO.countTransactionsToday())
+        );
+
+        lblItemsReceived.setText(
+                String.valueOf(transactionsDAO.countItemsReceived())
+        );
+
+        lblItemsIssued.setText(
+                String.valueOf(transactionsDAO.countItemsIssued())
+        );
+
+        lblExpiredItems.setText(
+                String.valueOf(transactionsDAO.countExpiredItems())
+        );
+    }
+
+        private void applyFilter() {
+        transactionList.clear();
+
+        String filter = filterCombo.getValue();
+
+        try {
+            switch (filter) {
+                case "Today" ->
+                    transactionList.addAll(
+                            transactionsDAO.getTransactionsToday()
+                    );
+
+                case "This Week" ->
+                    transactionList.addAll(
+                            transactionsDAO.getTransactionsThisWeek()
+                    );
+
+                case "Last Week" ->
+                    transactionList.addAll(
+                            transactionsDAO.getTransactionsLastWeek()
+                    );
+
+                case "Last Month" ->
+                    transactionList.addAll(
+                            transactionsDAO.getTransactionsLastMonth()
+                    );
+            }
+
+            loadSummaryCards(); // dashboard stays in sync
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Filter Error", "Unable to apply selected filter.");
+        }
+    }
+
 }
