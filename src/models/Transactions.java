@@ -14,6 +14,8 @@ public class Transactions {
     private final IntegerProperty quantity;
     private final StringProperty performedBy;
     private final StringProperty remarks;
+    private final StringProperty requesterName;
+    private final StringProperty requesterId;
 
     public Transactions(String transactionId,
             String date,
@@ -21,14 +23,18 @@ public class Transactions {
             String type,
             int quantity,
             String performedBy,
+            String requesterName,
+            String requesterId,
             String remarks
-    ){
+    ) {
         this.transactionId = new SimpleStringProperty(transactionId);
         this.date = new SimpleStringProperty(date);
         this.itemName = new SimpleStringProperty(itemName);
         this.type = new SimpleStringProperty(type);
         this.quantity = new SimpleIntegerProperty(quantity);
         this.performedBy = new SimpleStringProperty(performedBy);
+        this.requesterName = new SimpleStringProperty(requesterName);
+        this.requesterId = new SimpleStringProperty(requesterId);
         this.remarks = new SimpleStringProperty(remarks);
     }
 
@@ -64,6 +70,14 @@ public class Transactions {
         return performedBy;
     }
 
+    public StringProperty requesterNameProperty() {
+        return requesterName;
+    }
+
+    public StringProperty requesterIdProperty() {
+        return requesterId;
+    }
+
     public StringProperty remarksProperty() {
         return remarks;
     }
@@ -91,6 +105,14 @@ public class Transactions {
 
     public String getPerformedBy() {
         return performedBy.get();
+    }
+
+    public String getRequesterName() {
+        return requesterName.get();
+    }
+
+    public String getRequesterId() {
+        return requesterId.get();
     }
 
     public String getRemarks() {

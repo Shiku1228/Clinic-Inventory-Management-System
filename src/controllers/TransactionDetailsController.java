@@ -50,19 +50,17 @@ public class TransactionDetailsController implements Initializable {
     public void setTransaction(Transactions transaction) {
         this.transaction = transaction;
 
-        // Populate fields
-        txtDate.setText(transaction.dateProperty().get());
-        txtItem.setText(transaction.itemNameProperty().get());
-        txtType.setText(transaction.typeProperty().get());
-        txtQuantity.setText(String.valueOf(transaction.quantityProperty().get()));
-        txtPerformedBy.setText(transaction.performedByProperty().get());
-        txtRemarks.setText(transaction.remarksProperty().get());
-
-        // TEMP / PLACEHOLDER (until DB is wired)
-        txtRequester.setText("Renz S. Latangga");
-        txtRequesterId.setText("2411600373");
-        txtTransactionNo.setText("Clnc089347380ABC");
+        txtDate.setText(transaction.getDate());
+        txtRequester.setText(transaction.getRequesterName());
+        txtRequesterId.setText(transaction.getRequesterId());
+        txtItem.setText(transaction.getItemName());
+        txtType.setText(transaction.getType());
+        txtQuantity.setText(String.valueOf(transaction.getQuantity()));
+        txtPerformedBy.setText(transaction.getPerformedBy());
+        txtRemarks.setText(transaction.getRemarks());
+        txtTransactionNo.setText(transaction.getTransactionId());
     }
+
 
     /* =========================
        BUTTON ACTIONS

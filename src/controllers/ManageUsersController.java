@@ -270,7 +270,7 @@ public class ManageUsersController implements Initializable {
         // Load the user's own avatar image from their userList
         Image avatar;
         try {
-            avatar = new Image(getClass().getResourceAsStream(user.getAvatarUrl()));
+            avatar = new Image(getClass().getResourceAsStream(user.getAvatarPath()));
         } catch (Exception e) {
             // Fallback if image not found
             avatar = new Image(getClass().getResourceAsStream("/resource/avatars/user.png"));

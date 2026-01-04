@@ -4,17 +4,27 @@
  */
 package controllers;
 
+import dao.UsersDAO;
+import database.MongoDBConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import dao.UsersDAO;
+import com.mongodb.client.MongoDatabase;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.scene.image.ImageView;
 import models.Users;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class AddUserDialogController implements Initializable {
-    
+
     @FXML
     private TextField nameField;
     @FXML
@@ -27,39 +37,73 @@ public class AddUserDialogController implements Initializable {
     private TextField contactField;
     @FXML
     private TextField emailField;
-    @FXML 
+    @FXML
     private Button submitButton;
     @FXML
     private Button cancelButton;
-    
+    @FXML
+    private ImageView avatarPreview;
+    @FXML
+    private Button chooseAvatarBtn;
+
+    private String avatarPath;
+
     private Users createdUser;
+
+    private dao.UsersDAO usersDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         roleBox.getItems().addAll("Director", "Doctor", "Nurse", "Admin");
         statusBox.getItems().addAll("Active", "Inactive");
-        
+
         //for setting default of selection
         roleBox.getSelectionModel().selectFirst();
         statusBox.getSelectionModel().selectFirst();
-    }    
-    
+
+        usersDAO = new UsersDAO(MongoDBConnection.getDatabase());
+    }
+
     @FXML
-    private void handleSubmit(){
+    private void handleSubmit() {
         String username = nameField.getText().trim();
         String password = passwordField.getText().trim();
         String role = roleBox.getValue();
         String contact = contactField.getText().trim();
         String email = emailField.getText().trim();
         String status = statusBox.getValue();
-        
-        //validation
-        if(username.isEmpty() || password.isEmpty()){
+
+        // validation
+        if (username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Validation Error", "Username and password cannot be empty.");
             return;
         }
-        
-        //Create the user object 
+
+        // Copy the chosen avatar to src/resource/avatars
+        String savedAvatarPath = null;
+        if (avatarPath != null) {
+            try {
+                File sourceFile = new File(new java.net.URI(avatarPath));
+                String fileName = System.currentTimeMillis() + "_" + sourceFile.getName(); // unique name
+                File destDir = new File("src/resource/avatars");
+                if (!destDir.exists()) {
+                    destDir.mkdirs(); // create folder if not exist
+                }
+                File destFile = new File(destDir, fileName);
+
+                Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                savedAvatarPath = "/resource/avatars/" + fileName; // path used in Users
+            } catch (IOException | java.net.URISyntaxException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "File Error", "Failed to save avatar image.");
+                return;
+            }
+        } else {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please choose an avatar.");
+            return;
+        }
+
+        // Create the user object
         createdUser = new Users(
                 String.valueOf(System.currentTimeMillis()),
                 username,
@@ -67,36 +111,56 @@ public class AddUserDialogController implements Initializable {
                 contact,
                 email,
                 status,
-                "resource/avatars/user.png"//default image for a user
+                savedAvatarPath // use chosen avatar
         );
-        
-        //debugging message
-        System.out.println("User Created: " + username);
-        
-        closeDialog();
+
+        boolean inserted = usersDAO.insertUser(createdUser);
+
+        if (inserted) {
+            showAlert(Alert.AlertType.INFORMATION, "Success", "User added successfully!");
+            closeDialog();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to add user to database.");
+        }
     }
-    
+
     @FXML
-    private void handleCancel(){
+    private void handleCancel() {
         closeDialog();
     }
-    
+
     //helper to close the dialog
-    private void closeDialog(){
+    private void closeDialog() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
-    
+
     //helper to show the Notifications
-    private void showAlert(Alert.AlertType type, String title, String message){
+    private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
-    public Users getCreatedUser(){
+
+    public Users getCreatedUser() {
         return createdUser;
+    }
+
+    @FXML
+    private void handleChooseAvatar() {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Choose Avatar");
+        fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
+        );
+
+        java.io.File selectedFile = fileChooser.showOpenDialog(chooseAvatarBtn.getScene().getWindow());
+        if (selectedFile != null) {
+            avatarPath = selectedFile.toURI().toString(); // store path for saving user
+            avatarPreview.setImage(new javafx.scene.image.Image(avatarPath)); // show preview
+        }
+
     }
 }

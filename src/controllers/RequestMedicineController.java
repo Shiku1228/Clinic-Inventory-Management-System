@@ -200,6 +200,8 @@ public class RequestMedicineController implements Initializable {
         String quantityStr = quantityField.getText().trim();
         String requestedBy = requestedByField.getText().trim();
         String requestedFrom = requestedFromField.getText().trim();
+        String requesterName = requestedByField.getText().trim();
+        String requesterId = requesterIdField.getText().trim();
         String remarks = remarksArea.getText().trim();
 
         if (medicineName.isEmpty() || quantityStr.isEmpty()
@@ -237,7 +239,9 @@ public class RequestMedicineController implements Initializable {
                     medicineName,
                     "REQUEST",
                     quantity,
-                    requestedBy,
+                    requestedFrom, // performedBy
+                    requesterName, // requesterName
+                    requesterId, // requesterId
                     remarks
             );
 

@@ -35,6 +35,8 @@ public class TransactionsDAO {
                     doc.getString("type"),
                     doc.getInteger("quantity", 0),
                     doc.getString("performedBy"),
+                    doc.getString("requesterName"),
+                    doc.getString("requesterId"),
                     doc.getString("remarks")
             );
 
@@ -54,6 +56,10 @@ public class TransactionsDAO {
                 .append("type", transaction.getType())
                 .append("quantity", transaction.getQuantity())
                 .append("performedBy", transaction.getPerformedBy())
+                .append("requesterName",
+                        transaction.getRequesterName() != null ? transaction.getRequesterName() : "N/A")
+                .append("requesterId",
+                        transaction.getRequesterId() != null ? transaction.getRequesterId() : "N/A")
                 .append("remarks", transaction.getRemarks());
 
         collection.insertOne(doc);
@@ -70,6 +76,8 @@ public class TransactionsDAO {
                     doc.getString("type"),
                     doc.getInteger("quantity", 0),
                     doc.getString("performedBy"),
+                    doc.getString("requesterName"),
+                    doc.getString("requesterId"),
                     doc.getString("remarks")
             );
 
@@ -157,13 +165,15 @@ public class TransactionsDAO {
                     doc.getString("type"),
                     doc.getInteger("quantity", 0),
                     doc.getString("performedBy"),
+                    doc.getString("requesterName"),
+                    doc.getString("requesterId"),
                     doc.getString("remarks")
             );
 
             t.setId(doc.getObjectId("_id"));
             list.add(t);
         }
-        
+
         return list;
     }
 }

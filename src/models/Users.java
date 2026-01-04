@@ -12,16 +12,16 @@ public class Users {
     private final StringProperty contact;
     private final StringProperty email;
     private final StringProperty status;
-    private final StringProperty avatarUrl;
+    private final StringProperty avatarPath;
     
-    public Users (String id, String name, String role, String contact, String email, String status, String avatarUrl){
+    public Users (String id, String name, String role, String contact, String email, String status, String avatarPath){
         this.id = new SimpleStringProperty(id);
         this.name = new SimpleStringProperty (name);
         this.role = new SimpleStringProperty (role);
         this.contact = new SimpleStringProperty(contact);
         this.email = new SimpleStringProperty(email);
         this.status = new SimpleStringProperty (status);
-        this.avatarUrl = new SimpleStringProperty(avatarUrl);
+        this.avatarPath = new SimpleStringProperty(avatarPath);
     }
     
     //Getters
@@ -31,7 +31,7 @@ public class Users {
     public String getContact() {return contact.get();}
     public String getEmail() {return email.get();}
     public String getStatus() {return status.get();}
-    public String getAvatarUrl() { return avatarUrl.get(); }
+    public String getAvatarPath() { return avatarPath.get(); }
     
     //Setters
     public void setId(String id) {this.id.set(id);}
@@ -40,7 +40,7 @@ public class Users {
     public void setContact(String contact) {this.contact.set(contact);}
     public void setEmail(String email) {this.email.set(email);}
     public void setStatus(String status) {this.status.set(status);}
-    public void setAvatarUrl(String avatarUrl) { this.avatarUrl.set(avatarUrl); }
+    public void setAvatarPath(String avatarUrl) { this.avatarPath.set(avatarUrl); }
     
     //Properties for Table View
     public StringProperty idProperty() {return id;}
@@ -49,5 +49,5 @@ public class Users {
     public StringProperty contactProperty() {return contact;}
     public StringProperty emailProperty() {return email;}
     public StringProperty statusProperty() {return status;}
-    public StringProperty avatarUrlProperty() { return avatarUrl; }
+    public StringProperty avatarPathProperty() { return avatarPath; }
 }   
