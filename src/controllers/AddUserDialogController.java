@@ -52,6 +52,8 @@ public class AddUserDialogController implements Initializable {
 
     private dao.UsersDAO usersDAO;
 
+    private boolean isSubmitting = false;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         roleBox.getItems().addAll("Director", "Doctor", "Nurse", "Admin");
@@ -62,67 +64,86 @@ public class AddUserDialogController implements Initializable {
         statusBox.getSelectionModel().selectFirst();
 
         usersDAO = new UsersDAO(MongoDBConnection.getDatabase());
-    }
 
+        //prevent Enter key from firing submit button automatically
+        submitButton.setDefaultButton(false);
+        cancelButton.setCancelButton(false);
+    }
+    
     @FXML
     private void handleSubmit() {
-        String username = nameField.getText().trim();
-        String password = passwordField.getText().trim();
-        String role = roleBox.getValue();
-        String contact = contactField.getText().trim();
-        String email = emailField.getText().trim();
-        String status = statusBox.getValue();
-
-        // validation
-        if (username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Username and password cannot be empty.");
+        // Prevent double submission
+        if (isSubmitting) {
             return;
         }
+        isSubmitting = true;
+        submitButton.setDisable(true);
 
-        // Copy the chosen avatar to src/resource/avatars
-        String savedAvatarPath = null;
-        if (avatarPath != null) {
+        try {
+            String username = nameField.getText().trim();
+            String password = passwordField.getText().trim();
+            String role = roleBox.getValue();
+            String contact = contactField.getText().trim();
+            String email = emailField.getText().trim();
+            String status = statusBox.getValue();
+
+            // Validation
+            if (username.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Validation Error", "Username and password cannot be empty.");
+                return;
+            }
+
+            if (avatarPath == null) {
+                showAlert(Alert.AlertType.WARNING, "Validation Error", "Please choose an avatar.");
+                return;
+            }
+
+            // Copy avatar to resource folder
+            String savedAvatarPath;
             try {
                 File sourceFile = new File(new java.net.URI(avatarPath));
-                String fileName = System.currentTimeMillis() + "_" + sourceFile.getName(); // unique name
+                String fileName = sourceFile.getName();
                 File destDir = new File("src/resource/avatars");
                 if (!destDir.exists()) {
-                    destDir.mkdirs(); // create folder if not exist
+                    destDir.mkdirs();
                 }
                 File destFile = new File(destDir, fileName);
-
                 Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                savedAvatarPath = "/resource/avatars/" + fileName; // path used in Users
+                savedAvatarPath = "/resource/avatars/" + fileName;
             } catch (IOException | java.net.URISyntaxException e) {
                 e.printStackTrace();
                 showAlert(Alert.AlertType.ERROR, "File Error", "Failed to save avatar image.");
                 return;
             }
-        } else {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please choose an avatar.");
-            return;
-        }
 
-        // Create the user object
-        createdUser = new Users(
-                String.valueOf(System.currentTimeMillis()),
-                username,
-                role,
-                contact,
-                email,
-                status,
-                savedAvatarPath // use chosen avatar
-        );
+            // Create the user object
+            String newUserId = usersDAO.generateNextUserId();
+            createdUser = new Users(
+                    null,
+                    newUserId,
+                    username,
+                    role,
+                    contact,
+                    email,
+                    status,
+                    savedAvatarPath
+            );
 
-        boolean inserted = usersDAO.insertUser(createdUser);
+            // Insert into database
+            if (usersDAO.insertUser(createdUser)) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "User added successfully!");
+                closeDialog(); // close dialog only after successful insertion
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to add user to database.");
+            }
 
-        if (inserted) {
-            showAlert(Alert.AlertType.INFORMATION, "Success", "User added successfully!");
-            closeDialog();
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to add user to database.");
+        } finally {
+            // ALWAYS reset flag and enable button
+            isSubmitting = false;
+            submitButton.setDisable(false);
         }
     }
+    
 
     @FXML
     private void handleCancel() {

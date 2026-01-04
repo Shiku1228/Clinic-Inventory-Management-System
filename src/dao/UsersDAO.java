@@ -24,6 +24,7 @@ public class UsersDAO {
     public boolean insertUser(Users user) {
         try {
             Document doc = new Document("_id", new ObjectId())
+                    .append("userId", user.getUserId())
                     .append("username", user.getName())
                     .append("role", user.getRole())
                     .append("contact", user.getContact())
@@ -32,6 +33,7 @@ public class UsersDAO {
                     .append("avatar", user.getAvatarPath());
 
             usersCollection.insertOne(doc);
+            
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,6 +47,7 @@ public class UsersDAO {
         for (Document doc : usersCollection.find()) {
             Users user = new Users(
                     doc.getObjectId("_id").toHexString(),
+                    doc.getString("userId"),
                     doc.getString("username"),
                     doc.getString("role"),
                     doc.getString("contact"),
@@ -63,6 +66,7 @@ public class UsersDAO {
         if (doc != null) {
             return new Users(
                     doc.getObjectId("_id").toHexString(),
+                    doc.getString("userId"),
                     doc.getString("username"),
                     doc.getString("role"),
                     doc.getString("contact"),
@@ -79,7 +83,7 @@ public class UsersDAO {
     public boolean updateUser(Users user) {
         try {
             usersCollection.updateOne(
-                    Filters.eq("_id", new ObjectId(user.getId())),
+                    Filters.eq("_id", new ObjectId(user.getUserId())),
                     Updates.combine(
                             Updates.set("username", user.getName()),
                             Updates.set("role", user.getRole()),
@@ -105,5 +109,29 @@ public class UsersDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String generateNextUserId() {
+
+        Document lastUser = usersCollection.find()
+                .sort(new Document("userId", -1))
+                .first();
+
+        // ✅ No users at all
+        if (lastUser == null) {
+            return "USR_001";
+        }
+
+        String lastId = lastUser.getString("userId");
+
+        // ✅ Users exist but userId is missing
+        if (lastId == null || !lastId.contains("_")) {
+            return "USR_001";
+        }
+
+        int num = Integer.parseInt(lastId.split("_")[1]);
+        num++;
+
+        return String.format("USR_%03d", num);
     }
 }

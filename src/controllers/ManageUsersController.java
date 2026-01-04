@@ -1,5 +1,8 @@
 package controllers;
 
+import com.mongodb.client.MongoDatabase;
+import dao.UsersDAO;
+import database.MongoDBConnection;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
@@ -69,12 +72,24 @@ public class ManageUsersController implements Initializable {
 
     //Data
     private ObservableList<Users> userList = FXCollections.observableArrayList();
+    private UsersDAO usersDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        ///for the database integration
+        MongoDatabase db = MongoDBConnection.getDatabase();
+        usersDAO = new UsersDAO(db);
+
+        ///setup sa UI
         setupUsersTable();
         setupSearch();
         setupSelectedUserCard();
+
+        //set up para sa database
+        loadUsersFromDatabase();
+
+        ///set up sa card
         setupSummaryCards();
     }
 
@@ -95,7 +110,7 @@ public class ManageUsersController implements Initializable {
     private void setupUsersTable() {
         //Columns of the Table
         TableColumn<Users, String> idCol = new TableColumn<>("User ID");
-        idCol.setCellValueFactory(cellData -> cellData.getValue().idProperty());
+        idCol.setCellValueFactory(cellData -> cellData.getValue().userIdProperty());
 
         TableColumn<Users, String> nameCol = new TableColumn<>("User Name");
         nameCol.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -134,11 +149,16 @@ public class ManageUsersController implements Initializable {
                         user.setStatus("Active");
                     }
 
+                    usersDAO.updateUser(user);   
+                    loadUsersFromDatabase();     
+                    setupSummaryCards();
+                    
                     updateToggleButton(user);
                     usersTable.refresh();
                     usersTable.getSelectionModel().select(user);
                     setupSummaryCards();
                 });
+
             }
 
             @Override
@@ -155,7 +175,7 @@ public class ManageUsersController implements Initializable {
                     setGraphic(box);;
                 }
             }
-            
+
             //for styling the toggleButton
             private void updateToggleButton(Users user) {
                 toggleButton.getStyleClass().removeAll(
@@ -176,55 +196,6 @@ public class ManageUsersController implements Initializable {
 
         usersTable.getColumns().setAll(idCol, nameCol, roleCol, contactCol, emailCol, statusCol, actionsCol);
         usersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        //Sample data items
-        userList.addAll(
-                new Users(
-                        "1",
-                        "Renz Latangga",
-                        "Director",
-                        "09999999999",
-                        "renz@email.com",
-                        "Active",
-                        "/resource/avatars/renz_pfp.png"
-                ),
-                new Users(
-                        "2",
-                        "John Daniel Marañan",
-                        "Doctor",
-                        "09998887777",
-                        "janjan@email.com",
-                        "Active",
-                        "/resource/avatars/janjan_pfp.png"
-                ),
-                new Users(
-                        "3",
-                        "John Christian Abelgas",
-                        "Nurse",
-                        "09997776666",
-                        "upaw@email.com",
-                        "Active",
-                        "/resource/avatars/upaw_pfp.png"
-                ),
-                new Users(
-                        "4",
-                        "Merdin Harid",
-                        "Admin",
-                        "09996665555",
-                        "merdin@email.com",
-                        "Active",
-                        "/resource/avatars/merdin_pfp.png"
-                ),
-                new Users(
-                        "5",
-                        "Krish Talino",
-                        "Admin",
-                        "09995554444",
-                        "krish@email.com",
-                        "Active",
-                        "/resource/avatars/krish_pfp.png"
-                )
-        );
 
         usersTable.setItems(userList);
 
@@ -352,7 +323,7 @@ public class ManageUsersController implements Initializable {
                         || user.getRole().toLowerCase().contains(searchKeyword)
                         || user.getStatus().toLowerCase().contains(searchKeyword);
             });
-            
+
             setupSummaryCards();
         });
 
@@ -394,40 +365,44 @@ public class ManageUsersController implements Initializable {
 
             Users newUser = controller.getCreatedUser();
             if (newUser != null) {
-                userList.add(newUser);
+                loadUsersFromDatabase();
                 setupSummaryCards();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
-    private void openEditUserDialog(Users user){
-        try{
+    private void openEditUserDialog(Users user) {
+        try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/views/EditUserDialog.fxml")
             );
-            
+
             Scene scene = new Scene(loader.load());
-            
+
             Stage stage = new Stage();
             stage.setTitle("Edit User");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
             stage.setScene(scene);
-            
+
             EditUserDialogController controller = loader.getController();
             controller.setUser(user);
-            
+
             stage.showAndWait();
-            
-            
+
             usersTable.refresh();
             setupSummaryCards();
-            
-        } catch (IOException e){
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadUsersFromDatabase() {
+        userList.clear();
+        userList.addAll(usersDAO.getAllUser());
     }
 }
