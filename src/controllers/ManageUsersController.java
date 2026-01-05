@@ -91,6 +91,7 @@ public class ManageUsersController implements Initializable {
 
         ///set up sa card
         setupSummaryCards();
+
     }
 
     private void setupSummaryCards() {
@@ -149,10 +150,10 @@ public class ManageUsersController implements Initializable {
                         user.setStatus("Active");
                     }
 
-                    usersDAO.updateUser(user);   
-                    loadUsersFromDatabase();     
+                    usersDAO.updateUser(user);
+                    loadUsersFromDatabase();
                     setupSummaryCards();
-                    
+
                     updateToggleButton(user);
                     usersTable.refresh();
                     usersTable.getSelectionModel().select(user);
@@ -392,6 +393,9 @@ public class ManageUsersController implements Initializable {
             controller.setUser(user);
 
             stage.showAndWait();
+
+            //update the DB usingg the update User
+            usersDAO.updateUser(user);
 
             usersTable.refresh();
             setupSummaryCards();

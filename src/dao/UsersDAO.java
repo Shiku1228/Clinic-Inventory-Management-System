@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import static java.nio.file.Files.list;
 import models.Users;
 import org.bson.Document;
@@ -46,7 +47,7 @@ public class UsersDAO {
         List<Users> list = new ArrayList<>();
         for (Document doc : usersCollection.find()) {
             Users user = new Users(
-                    doc.getObjectId("_id").toHexString(),
+                    doc.getObjectId("_id"),
                     doc.getString("userId"),
                     doc.getString("username"),
                     doc.getString("role"),
@@ -65,7 +66,7 @@ public class UsersDAO {
         Document doc = usersCollection.find(Filters.eq("username", username)).first();
         if (doc != null) {
             return new Users(
-                    doc.getObjectId("_id").toHexString(),
+                    doc.getObjectId("_id"),
                     doc.getString("userId"),
                     doc.getString("username"),
                     doc.getString("role"),
@@ -81,9 +82,14 @@ public class UsersDAO {
     //update user info
     // Update user info
     public boolean updateUser(Users user) {
+        
+        if(user == null || user.getUserId() == null){
+            System.out.println("Cannot update user: ID is NULL");
+            return false;
+        }
         try {
-            usersCollection.updateOne(
-                    Filters.eq("_id", new ObjectId(user.getUserId())),
+            UpdateResult result = usersCollection.updateOne(
+                    Filters.eq("userId", user.getUserId()),
                     Updates.combine(
                             Updates.set("username", user.getName()),
                             Updates.set("role", user.getRole()),
@@ -93,7 +99,15 @@ public class UsersDAO {
                             Updates.set("avatar", user.getAvatarPath())
                     )
             );
+            
+            if (result.getMatchedCount() == 0){
+                System.out.println("No user found with ID: " + user.getUserId());
+                return false;
+            }
+            
+            System.out.println("User Updated: " + user.getUserId());
             return true;
+            
         } catch (Exception e) {
             e.printStackTrace();
             return false;
