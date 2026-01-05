@@ -4,11 +4,15 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import static java.nio.file.Files.list;
 import models.Users;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +38,7 @@ public class UsersDAO {
                     .append("avatar", user.getAvatarPath());
 
             usersCollection.insertOne(doc);
-            
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,8 +86,8 @@ public class UsersDAO {
     //update user info
     // Update user info
     public boolean updateUser(Users user) {
-        
-        if(user == null || user.getUserId() == null){
+
+        if (user == null || user.getUserId() == null) {
             System.out.println("Cannot update user: ID is NULL");
             return false;
         }
@@ -99,15 +103,15 @@ public class UsersDAO {
                             Updates.set("avatar", user.getAvatarPath())
                     )
             );
-            
-            if (result.getMatchedCount() == 0){
+
+            if (result.getMatchedCount() == 0) {
                 System.out.println("No user found with ID: " + user.getUserId());
                 return false;
             }
-            
+
             System.out.println("User Updated: " + user.getUserId());
             return true;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -117,8 +121,8 @@ public class UsersDAO {
     // Delete user
     public boolean deleteUser(String userId) {
         try {
-            usersCollection.deleteOne(Filters.eq("_id", new ObjectId(userId)));
-            return true;
+            DeleteResult result = usersCollection.deleteOne(Filters.eq("userId", userId));
+            return result.getDeletedCount() > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

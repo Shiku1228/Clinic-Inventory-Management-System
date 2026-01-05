@@ -87,6 +87,7 @@
             <HBox spacing="10">
                 <Button fx:id="editButton" styleClass="edit-btn" text="Edit" />
                 <Button fx:id="deactivateButton" styleClass="delete-btn" text="Deactivate" />
+                <Button fx:id="deleteButton" onAction="#handleDeleteUser" styleClass="delete-btn" text="Delete" />
             </HBox>
 
         </HBox>

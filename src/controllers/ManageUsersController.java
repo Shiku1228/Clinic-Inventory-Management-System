@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Optional;
 import javafx.application.Platform;
 
 public class ManageUsersController implements Initializable {
@@ -63,6 +64,8 @@ public class ManageUsersController implements Initializable {
     private Button editButton;
     @FXML
     private Button deactivateButton;
+    @FXML
+    private Button deleteButton;
 
     //User Table    
     @FXML
@@ -91,7 +94,6 @@ public class ManageUsersController implements Initializable {
 
         ///set up sa card
         setupSummaryCards();
-
     }
 
     private void setupSummaryCards() {
@@ -132,6 +134,7 @@ public class ManageUsersController implements Initializable {
         actionsCol.setCellFactory(col -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
             private final Button toggleButton = new Button("Deactivate");
+            private final Button deleteButton = new Button("Delete");
 
             {
                 editButton.getStyleClass().add("table-edit-btn");
@@ -160,6 +163,7 @@ public class ManageUsersController implements Initializable {
                     setupSummaryCards();
                 });
 
+                deactivateButton.setOnAction(e -> handleDeleteUser());
             }
 
             @Override
@@ -225,6 +229,9 @@ public class ManageUsersController implements Initializable {
                 setupSummaryCards();
             }
         });
+
+        deleteButton.setOnAction(e -> handleDeleteUser());
+
 
         //add user button
         addUserButton.setOnAction(e -> {
@@ -408,5 +415,46 @@ public class ManageUsersController implements Initializable {
     private void loadUsersFromDatabase() {
         userList.clear();
         userList.addAll(usersDAO.getAllUser());
+    }
+
+    private Users getSelectedUser() {
+        return usersTable.getSelectionModel().getSelectedItem();
+    }
+    
+    @FXML
+    private void handleDeleteUser() {
+        Users selectedUser = usersTable.getSelectionModel().getSelectedItem();
+
+        if (selectedUser == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No User Selected");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a user to delete.");
+            alert.showAndWait();
+            return; // now return after showing warning
+        }
+
+        // Confirmation alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete User");
+        alert.setHeaderText("Are you sure you want to delete this user?");
+        alert.setContentText("User: " + selectedUser.getName() + " (" + selectedUser.getUserId() + ")");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean deleted = usersDAO.deleteUser(selectedUser.getUserId());
+            if (deleted) {
+                System.out.println("User deleted: " + selectedUser.getUserId());
+                loadUsersFromDatabase(); // reload table after deletion
+            } else {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Delete Failed");
+                errorAlert.setHeaderText(null);
+                errorAlert.setContentText("Failed to delete user: " + selectedUser.getName());
+                errorAlert.showAndWait();
+            }
+        } else {
+            System.out.println("User deletion canceled");
+        }
     }
 }
