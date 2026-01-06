@@ -24,7 +24,7 @@ public class ClinicInventoryManagementSystem extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         stage = primaryStage;
-        Parent root = loadFXML("Dashboard");
+        Parent root = loadFXML("Login");
         scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Clinic Inventory ManagementSystem");
