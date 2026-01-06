@@ -152,4 +152,10 @@ public class UsersDAO {
 
         return String.format("USR_%03d", num);
     }
+    
+    public Document authenticate(String username){
+        return usersCollection.find(
+                Filters.eq("username", username)
+        ).first();
+    }
 }

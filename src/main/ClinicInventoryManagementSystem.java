@@ -28,7 +28,8 @@ public class ClinicInventoryManagementSystem extends Application {
         scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Clinic Inventory ManagementSystem");
-        stage.setMaximized(true);
+        stage.setMaximized(false);
+        stage.setResizable(true);
         stage.show();
     }
 

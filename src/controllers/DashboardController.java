@@ -12,6 +12,9 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 import controllers.DashboardContentController;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class DashboardController implements Initializable {
 
@@ -78,9 +81,35 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void handleLogout() {
-        System.out.println("Logging out...");
-        // Implement logout logic here, e.g., return to login screen
-        System.exit(0);
+        try {
+            // Get the current stage
+            Stage stage = (Stage) btnLogout.getScene().getWindow();
+            
+            // Load the login view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
+            Parent root = loader.load();
+            
+            // Create new scene with the login view
+            Scene scene = new Scene(root);
+            
+            // Apply the current window size to the new scene
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+            
+            // Set the new scene
+            stage.setScene(scene);
+            
+            // Restore window size
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
+            
+            // Center the window on the screen
+            stage.centerOnScreen();
+            
+        } catch (IOException e) {
+            System.err.println("Failed to load login screen: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**

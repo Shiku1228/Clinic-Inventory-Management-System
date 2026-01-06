@@ -1,7 +1,89 @@
-/*
- * Empty Stylesheet file.
- */
+.login-root {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
 
-.mainFxmlClass {
+.login-box {
+    -fx-background-color: #f5f5f5;
+    -fx-padding: 20 30 20 30;
+    -fx-spacing: 15;
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10,0,0,4);
+    -fx-max-width: 650;
+    -fx-min-width: 400;
+}
 
+.logo-image {
+    -fx-padding: 10;
+}
+
+.school-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-wrap-text: false;
+    -fx-pref-width: 400;
+    -fx-min-width: 400;
+    -fx-max-width: 550;
+}
+
+.system-name {
+    -fx-font-size: 14px;
+    -fx-text-fill: #1A237E;
+    -fx-text-alignment: center;
+}
+
+.input-row {
+    -fx-alignment: center-left;
+    -fx-spacing: 10;
+    -fx-pref-width: 350;
+}
+
+.input-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-width: 80;
+}
+
+.input-field {
+    -fx-font-size: 13px;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #151A5A;
+    -fx-border-width: 1;
+    -fx-pref-width: 250;
+}
+
+.error-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: red;
+    -fx-pref-height: 20;
+}
+
+.btn-login {
+    -fx-background-color: #151A5A;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 8 24 8 24;
+    -fx-min-width: 150;
+    -fx-font-size: 14px;
+}
+
+.forgot-link {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555;
+}
+
+.footer {
+    -fx-background-color: #151A5A;
+    
+}
+
+.footer-text {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
 }
