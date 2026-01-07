@@ -52,16 +52,17 @@ public class LoginController implements Initializable {
     @FXML
     private void handleLogin() {
         String username = usernameField.getText();
+        String password = passwordField.getText();
 
-        if (username.isEmpty()) {
-            errorLabel.setText("Please enter your username.");
+        if (username.isEmpty() || password.isEmpty()) {
+            errorLabel.setText("Username and password is required.");
             return;
         }
 
-        Document user = userDAO.authenticate(username);
+        Document user = userDAO.authenticate(username, password);
 
         if (user == null) {
-            errorLabel.setText("User not found.");
+            errorLabel.setText("Invalid username or password");
             return;
         }
 
