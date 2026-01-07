@@ -14,9 +14,10 @@ public class Users {
     private final StringProperty email;
     private final StringProperty status;
     private final StringProperty avatarPath;
+    private final StringProperty password;
 
     public Users(ObjectId mongoId, String userId, String name, String role,
-            String contact, String email, String status, String avatarPath) {
+            String contact, String email, String status, String avatarPath, String password) {
         this.mongoId = mongoId;
         this.userId = new SimpleStringProperty(userId);
         this.name = new SimpleStringProperty(name);
@@ -25,6 +26,7 @@ public class Users {
         this.email = new SimpleStringProperty(email);
         this.status = new SimpleStringProperty(status);
         this.avatarPath = new SimpleStringProperty(avatarPath);
+        this.password = new SimpleStringProperty(password);
     }
     
         //Getters
@@ -59,6 +61,10 @@ public class Users {
     public String getAvatarPath() {
         return avatarPath.get();
     }
+    
+    public String getPassword(){
+        return password.get();
+    }
 
     //Setters
     public void setMongoId(String id) {
@@ -91,6 +97,10 @@ public class Users {
 
     public void setAvatarPath(String avatarPath) {
         this.avatarPath.set(avatarPath);
+    }
+    
+    public void setPassword(String password){
+        this.password.set(password);
     }
 
     //Properties for Table View

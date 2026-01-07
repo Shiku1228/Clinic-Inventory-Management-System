@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import org.bson.Document;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import utils.Session;
 
 /**
  * FXML Controller class
@@ -112,19 +113,6 @@ public class LoginController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             errorLabel.setText("Failed to load dashboard");
-        }
-    }
-
-    public class Session {
-
-        private static Document currentUser;
-
-        public static void setCurrentUser(Document user) {
-            currentUser = user;
-        }
-
-        public static Document getCurrentUser() {
-            return currentUser;
         }
     }
 }

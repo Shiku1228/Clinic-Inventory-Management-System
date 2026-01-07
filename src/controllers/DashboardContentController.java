@@ -7,7 +7,9 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import utils.Session;
 
 public class DashboardContentController {
 
@@ -36,13 +38,20 @@ public class DashboardContentController {
     private VBox requestTodayCard;
     @FXML
     private VBox expiredItemsCard;
+    
+    @FXML
+    private Button btnAddNewMedicine;
+    @FXML
+    private Button btnViewInventory;
+    @FXML 
+    private Button btnNewRequest;
 
     private DashboardController dashboardController;
 
     public void initialize() {
         // Initialize date/time
         updateDateTime();
-        
+
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.minutes(1), e -> updateDateTime())
         );
@@ -57,7 +66,9 @@ public class DashboardContentController {
         expiredItemsLabel.setText("3");
 
         // Set welcome message
-        welcomeLabel.setText("Welcome Back, Nurse!");
+        welcomeLabel.setText("Welcome Back, " + Session.getUsername() + "!");
+
+        applyRoleBasedAccess();
     }
 
     private void updateDateTime() {
@@ -119,5 +130,90 @@ public class DashboardContentController {
         registeredUserCard.setOnMouseClicked(e -> handleSummaryClick("Users"));
         requestTodayCard.setOnMouseClicked(e -> handleSummaryClick("Requests"));
         expiredItemsCard.setOnMouseClicked(e -> handleSummaryClick("Expired Items"));
+    }
+
+    private void applyRoleBasedAccess() {
+        String role = Session.getRole();
+        if (role == null) {
+            return;
+        }
+
+        role = role.toLowerCase();
+
+        // Hide everything first
+        totalMedicinesCard.setManaged(false);
+        totalMedicinesCard.setVisible(false);
+        lowSupplyCard.setManaged(false);
+        lowSupplyCard.setVisible(false);
+        registeredUserCard.setManaged(false);
+        registeredUserCard.setVisible(false);
+        requestTodayCard.setManaged(false);
+        requestTodayCard.setVisible(false);
+        expiredItemsCard.setManaged(false);
+        expiredItemsCard.setVisible(false);
+
+        btnAddNewMedicine.setManaged(false);
+        btnAddNewMedicine.setVisible(false);
+        btnViewInventory.setManaged(false);
+        btnViewInventory.setVisible(false);
+        btnNewRequest.setManaged(false);
+        btnNewRequest.setVisible(false);
+
+        switch (role) {
+            case "director":
+                totalMedicinesCard.setManaged(true);
+                totalMedicinesCard.setVisible(true);
+                lowSupplyCard.setManaged(true);
+                lowSupplyCard.setVisible(true);
+                registeredUserCard.setManaged(true);
+                registeredUserCard.setVisible(true);
+                requestTodayCard.setManaged(true);
+                requestTodayCard.setVisible(true);
+                expiredItemsCard.setManaged(true);
+                expiredItemsCard.setVisible(true);
+
+                btnAddNewMedicine.setManaged(true);
+                btnAddNewMedicine.setVisible(true);
+                btnViewInventory.setManaged(true);
+                btnViewInventory.setVisible(true);
+                btnNewRequest.setManaged(true);
+                btnNewRequest.setVisible(true);
+                break;
+
+            case "admin":
+                registeredUserCard.setManaged(true);
+                registeredUserCard.setVisible(true);
+                totalMedicinesCard.setManaged(true);
+                totalMedicinesCard.setVisible(true);
+
+                btnAddNewMedicine.setManaged(true);
+                btnAddNewMedicine.setVisible(true);
+                btnViewInventory.setManaged(true);
+                btnViewInventory.setVisible(true);
+                break;
+
+            case "doctor":
+                requestTodayCard.setManaged(true);
+                requestTodayCard.setVisible(true);
+                expiredItemsCard.setManaged(true);
+                expiredItemsCard.setVisible(true);
+
+                btnNewRequest.setManaged(true);
+                btnNewRequest.setVisible(true);
+                btnViewInventory.setManaged(true);
+                btnViewInventory.setVisible(true);
+                break;
+
+            case "nurse":
+                requestTodayCard.setManaged(true);
+                requestTodayCard.setVisible(true);
+
+                btnNewRequest.setManaged(true);
+                btnNewRequest.setVisible(true);
+                break;
+
+            default:
+                break;
+        }
     }
 }

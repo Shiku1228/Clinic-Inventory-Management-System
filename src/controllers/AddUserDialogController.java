@@ -126,7 +126,8 @@ public class AddUserDialogController implements Initializable {
                     contact,
                     email,
                     status,
-                    savedAvatarPath
+                    savedAvatarPath,
+                    password
             );
 
             // Insert into database

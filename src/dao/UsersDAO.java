@@ -35,7 +35,9 @@ public class UsersDAO {
                     .append("contact", user.getContact())
                     .append("email", user.getEmail())
                     .append("status", user.getStatus())
-                    .append("avatar", user.getAvatarPath());
+                    .append("avatar", user.getAvatarPath())
+                    .append("password", user.getPassword());
+                    
 
             usersCollection.insertOne(doc);
 
@@ -58,7 +60,8 @@ public class UsersDAO {
                     doc.getString("contact"),
                     doc.getString("email"),
                     doc.getString("status"),
-                    doc.getString("avatar")
+                    doc.getString("avatar"),
+                    doc.getString("password")
             );
             list.add(user);
         }
@@ -77,7 +80,8 @@ public class UsersDAO {
                     doc.getString("contact"),
                     doc.getString("email"),
                     doc.getString("status"),
-                    doc.getString("avatar")
+                    doc.getString("avatar"),
+                    doc.getString("password")
             );
         }
         return null;
