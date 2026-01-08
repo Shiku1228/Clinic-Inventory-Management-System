@@ -10,6 +10,12 @@ import java.time.format.DateTimeFormatter;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import utils.Session;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ListCell;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
+import models.Notifications;
+import utils.NotificationManager;
 
 public class DashboardContentController {
 
@@ -38,13 +44,16 @@ public class DashboardContentController {
     private VBox requestTodayCard;
     @FXML
     private VBox expiredItemsCard;
-    
+
     @FXML
     private Button btnAddNewMedicine;
     @FXML
     private Button btnViewInventory;
-    @FXML 
+    @FXML
     private Button btnNewRequest;
+
+    @FXML
+    private ListView<Notifications> activityList;
 
     private DashboardController dashboardController;
 
@@ -69,7 +78,81 @@ public class DashboardContentController {
         welcomeLabel.setText("Welcome Back, " + Session.getUsername() + "!");
 
         applyRoleBasedAccess();
+
+        activityList.setItems(NotificationManager.getFeed());
+
+        activityList.setCellFactory(list -> new ListCell<Notifications>() {
+            @Override
+            protected void updateItem(Notifications item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    // VBox for the notification
+                    VBox box = new VBox(5);
+                    box.setPadding(new Insets(15)); // more padding for larger items
+                    box.setStyle("-fx-background-radius: 10; -fx-background-color: #E0E0E0;");
+
+                    // Main message
+                    Label message = new Label(item.getMessage());
+                    message.setWrapText(true);
+                    message.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #141652;");
+
+                    // Time label
+                    Label time = new Label(item.getTimeText());
+                    time.setStyle("-fx-font-size: 12px; -fx-text-fill: gray;");
+
+                    box.getChildren().addAll(message, time);
+
+                    // Color code by type
+                    String type = item.getType().toLowerCase();
+                    switch (type) {
+                        case "info" ->
+                            box.setStyle("-fx-background-color: #D0E9FF; -fx-background-radius: 10;");
+                        case "success" ->
+                            box.setStyle("-fx-background-color: #D4FFD8; -fx-background-radius: 10;");
+                        case "warning" ->
+                            box.setStyle("-fx-background-color: #FFF4C2; -fx-background-radius: 10;");
+                        case "expired" ->
+                            box.setStyle("-fx-background-color: #FFD6D6; -fx-background-radius: 10;");
+                        default ->
+                            box.setStyle("-fx-background-color: #E0E0E0; -fx-background-radius: 10;");
+                    }
+
+                    setGraphic(box);
+                }
+            }
+        });
+
+// Temporary Notifications for testing
+        NotificationManager.push(
+                "New medicine request submitted by Nurse Rodriguez",
+                "2 hours ago",
+                "INFO"
+        );
+
+        NotificationManager.push(
+                "Paracetamol stock replenished (+50 units)",
+                "5 hours ago",
+                "SUCCESS"
+        );
+
+        NotificationManager.push(
+                "Low stock alert: Betadine (10 units remaining)",
+                "1 day ago",
+                "WARNING"
+        );
+        
+        NotificationManager.push(
+                "Bro, ang kuan - na expire na ang inyong talking stage",
+                "Minutes ago",
+                "EXPIRED"
+        );
     }
+
+    
 
     private void updateDateTime() {
         LocalDateTime now = LocalDateTime.now();
