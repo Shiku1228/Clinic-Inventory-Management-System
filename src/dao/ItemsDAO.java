@@ -17,6 +17,8 @@ import javafx.scene.image.Image;
 import models.Items;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import utils.NotificationManager;
+import java.time.LocalDate;
 
 public class ItemsDAO {
 
@@ -62,6 +64,13 @@ public class ItemsDAO {
                 .append("imagePath", item.getImagePath());
 
         itemsCollection.insertOne(doc);
+
+        //notifs for the added items
+        NotificationManager.push(
+                "New item added: " + item.getItemName(),
+                "Just now",
+                "INFO"
+        );
     }
 
     public void updateItem(Items item) {
@@ -99,12 +108,24 @@ public class ItemsDAO {
                 eq("_id", new ObjectId(item.getMongoId())),
                 set("status", "Disabled")
         );
+
+        NotificationManager.push(
+                "Item disabled: " + item.getItemName(),
+                "Just now",
+                "ERROR"
+        );
     }
 
     public void enableItem(Items item) {
         itemsCollection.updateOne(
                 eq("_id", new ObjectId(item.getMongoId())),
                 set("status", "Available")
+        );
+            
+        NotificationManager.push(
+                "Item enabled: " + item.getItemName(),
+                "Just now",
+                "SUCCESS"
         );
     }
 
@@ -127,6 +148,16 @@ public class ItemsDAO {
             );
 
             list.add(item);
+
+            //notif for the expired items
+            LocalDate expiry = LocalDate.parse(item.getExpiryDate());
+            if (expiry.isBefore(LocalDate.now())) {
+                NotificationManager.push(
+                        "Expired medicine detected: " + item.getItemName(),
+                        "Today",
+                        "EXPIRED"
+                );
+            }
         }
         return list;
     }
@@ -154,9 +185,28 @@ public class ItemsDAO {
     // Decrease stock method
     public void decreaseStock(String itemId, int quantity) {
         ObjectId objectId = new ObjectId(itemId);
+
+        Document itemDoc = itemsCollection.find(eq("_id", objectId)).first();
+        if (itemDoc == null) {
+            return;
+        }
+
+        int currentStock = itemDoc.getInteger("quantityOnHand");
+        int newStock = currentStock - quantity;
+
         itemsCollection.updateOne(
-                new Document("_id", objectId),
+                eq("_id", objectId),
                 new Document("$inc", new Document("quantityOnHand", -quantity))
         );
+
+        //Low Stock Notification
+        if (newStock <= 10) {
+            NotificationManager.push(
+                    "Low stock alert: " + itemDoc.getString("name")
+                    + " (" + newStock + " remaining)",
+                    "Just now",
+                    "WARNING"
+            );
+        }
     }
 }

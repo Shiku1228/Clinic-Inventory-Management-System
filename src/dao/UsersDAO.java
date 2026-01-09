@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.NotificationManager;
+
 public class UsersDAO {
 
     private final MongoCollection<Document> usersCollection;
@@ -37,9 +39,15 @@ public class UsersDAO {
                     .append("status", user.getStatus())
                     .append("avatar", user.getAvatarPath())
                     .append("password", user.getPassword());
-                    
 
             usersCollection.insertOne(doc);
+
+            //for notif
+            NotificationManager.push(
+                    "New user created: " + user.getName() + " (" + user.getRole() + ")",
+                    "Just now",
+                    "INFO"
+            );
 
             return true;
         } catch (Exception e) {
@@ -95,6 +103,19 @@ public class UsersDAO {
             System.out.println("Cannot update user: ID is NULL");
             return false;
         }
+
+        Document oldUser = usersCollection.find(
+                Filters.eq("userId", user.getUserId())
+        ).first();
+
+        if (oldUser == null) {
+            System.out.println("User not found for update");
+            return false;
+        }
+
+        String oldRole = oldUser.getString("role");
+        String oldStatus = oldUser.getString("status");
+
         try {
             UpdateResult result = usersCollection.updateOne(
                     Filters.eq("userId", user.getUserId()),
@@ -111,6 +132,33 @@ public class UsersDAO {
             if (result.getMatchedCount() == 0) {
                 System.out.println("No user found with ID: " + user.getUserId());
                 return false;
+            }
+
+            // 🔔 GENERAL UPDATE
+            NotificationManager.push(
+                    "User updated: " + user.getName(),
+                    "Just now",
+                    "INFO"
+            );
+
+            // 🔔 ROLE CHANGE
+            if (!oldRole.equals(user.getRole())) {
+                NotificationManager.push(
+                        "Role changed: " + user.getName()
+                        + " (" + oldRole + " → " + user.getRole() + ")",
+                        "Just now",
+                        "WARNING"
+                );
+            }
+
+            // 🔔 STATUS CHANGE
+            if (!oldStatus.equals(user.getStatus())) {
+                NotificationManager.push(
+                        "User " + user.getStatus().toLowerCase()
+                        + ": " + user.getName(),
+                        "Just now",
+                        "ERROR"
+                );
             }
 
             System.out.println("User Updated: " + user.getUserId());
@@ -158,10 +206,27 @@ public class UsersDAO {
     }
 
     public Document authenticate(String username, String password) {
-        return usersCollection.find(
+
+        Document user = usersCollection.find(
                 new Document("username", username)
                         .append("password", password)
         ).first();
+
+        if (user != null) {
+            NotificationManager.push(
+                    "User logged in: " + username,
+                    "Just now",
+                    "SUCCESS"
+            );
+        } else {
+            NotificationManager.push(
+                    "Failed login attempt for: " + username,
+                    "Just now",
+                    "ERROR"
+            );
+        }
+
+        return user;
     }
 
 }

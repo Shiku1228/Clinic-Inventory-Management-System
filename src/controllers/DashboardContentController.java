@@ -125,31 +125,6 @@ public class DashboardContentController {
                 }
             }
         });
-
-// Temporary Notifications for testing
-        NotificationManager.push(
-                "New medicine request submitted by Nurse Rodriguez",
-                "2 hours ago",
-                "INFO"
-        );
-
-        NotificationManager.push(
-                "Paracetamol stock replenished (+50 units)",
-                "5 hours ago",
-                "SUCCESS"
-        );
-
-        NotificationManager.push(
-                "Low stock alert: Betadine (10 units remaining)",
-                "1 day ago",
-                "WARNING"
-        );
-        
-        NotificationManager.push(
-                "Bro, ang kuan - na expire na ang inyong talking stage",
-                "Minutes ago",
-                "EXPIRED"
-        );
     }
 
     

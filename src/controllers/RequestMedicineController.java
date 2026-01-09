@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import models.Transactions;
+import utils.NotificationManager;
+import utils.Session;
 
 public class RequestMedicineController implements Initializable {
 
@@ -250,6 +252,8 @@ public class RequestMedicineController implements Initializable {
 
             // Optional: reduce stock in Items collection
             itemsDAO.decreaseStock(selectedItem.getMongoId(), quantity);
+            
+            NotificationManager.push("New Medicine Request: " + selectedItem.getItemName() + " x " + quantity + "Requested By: " + requestedBy, "Just Now", "INFO");
 
             showAlert(Alert.AlertType.INFORMATION, "Request Sent", "Medicine request submitted successfully!");
 
