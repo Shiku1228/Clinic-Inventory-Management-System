@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import dao.TransactionsDAO;
 import database.MongoDBConnection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import models.Transactions;
 import org.bson.types.ObjectId;
 import java.time.LocalDateTime;
@@ -175,5 +176,16 @@ public class TransactionsDAO {
         }
 
         return list;
+    }
+
+    public long countRequestsToday() {
+        String today = LocalDate.now().toString();
+
+        return collection.countDocuments(
+                Filters.and(
+                        Filters.eq("type", "REQUEST"),
+                        Filters.regex("date", "^" + today)
+                )
+        );
     }
 }

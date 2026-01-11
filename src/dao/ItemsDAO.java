@@ -6,6 +6,7 @@ package dao;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
@@ -208,5 +209,26 @@ public class ItemsDAO {
                     "WARNING"
             );
         }
+    }
+    
+    //Total Medicines
+    public long countAllItems(){
+        return itemsCollection.countDocuments();
+    }
+    
+    //Low Stock (threshhold = 10)
+    public long countLowStockItems(int threshold){
+        return itemsCollection.countDocuments(
+                Filters.lt("quantityOnHand", threshold)
+        );
+    }
+    
+    //Exoired Itenms
+    public long countExpiredItems(){
+        String today = LocalDate.now().toString(    );//yy mm dd
+                                                        
+        return itemsCollection.countDocuments(
+                Filters.lt("expiryDate", today)
+        );
     }
 }

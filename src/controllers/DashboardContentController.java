@@ -1,5 +1,9 @@
 package controllers;
 
+import dao.ItemsDAO;
+import dao.TransactionsDAO;
+import dao.UsersDAO;
+import database.MongoDBConnection;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.animation.KeyFrame;
@@ -57,6 +61,11 @@ public class DashboardContentController {
 
     private DashboardController dashboardController;
 
+    private ItemsDAO itemsDAO = new ItemsDAO();
+    private UsersDAO usersDAO = new UsersDAO(MongoDBConnection.getDatabase());
+    private TransactionsDAO transactionsDAO
+            = new TransactionsDAO(MongoDBConnection.getDatabase());
+
     public void initialize() {
         // Initialize date/time
         updateDateTime();
@@ -67,12 +76,7 @@ public class DashboardContentController {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
-        // Initialize dashboard stats (replace with DB queries later)
-        totalMedicinesLabel.setText("142");
-        lowSupplyLabel.setText("5");
-        totalUsersLabel.setText("7");
-        requestsTodayLabel.setText("12");
-        expiredItemsLabel.setText("3");
+        loadDashboardStats();
 
         // Set welcome message
         welcomeLabel.setText("Welcome Back, " + Session.getUsername() + "!");
@@ -127,12 +131,39 @@ public class DashboardContentController {
         });
     }
 
-    
-
     private void updateDateTime() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm a");
         dateTimeLabel.setText(now.format(formatter));
+    }
+
+    private void loadDashboardStats() {
+
+        totalMedicinesLabel.setText(
+                String.valueOf(itemsDAO.countAllItems())
+        );
+
+        lowSupplyLabel.setText(
+                String.valueOf(itemsDAO.countLowStockItems(10))
+        );
+
+        totalUsersLabel.setText(
+                String.valueOf(usersDAO.countUsers())
+        );
+
+        requestsTodayLabel.setText(
+                String.valueOf(transactionsDAO.countRequestsToday())
+        );
+
+        expiredItemsLabel.setText(
+                String.valueOf(itemsDAO.countExpiredItems())
+        );
+
+        Timeline refreshStats = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> loadDashboardStats())
+        );
+        refreshStats.setCycleCount(Timeline.INDEFINITE);
+        refreshStats.play();
     }
 
     // Optional: Quick action button methods if you want them clickable

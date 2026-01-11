@@ -229,4 +229,8 @@ public class UsersDAO {
         return user;
     }
 
+    
+    public long countUsers(){ 
+        return usersCollection.countDocuments();
+    }
 }
