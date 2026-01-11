@@ -69,6 +69,10 @@ public class RequestMedicineController implements Initializable {
         loadAvailableMedicines();
         buildMedicinePopup();
 
+        //Auto-fill Requested From with logged-in user
+        requestedFromField.setText(Session.getUsername()); // or getUsername()
+        requestedFromField.setEditable(false);              // prevent manual edits
+        requestedFromField.setFocusTraversable(false);
         //Show popup when clicked the textfield
         medicineNameField.setOnMouseClicked(e -> {
             if (medicines.isEmpty()) {
@@ -231,6 +235,16 @@ public class RequestMedicineController implements Initializable {
             return;
         }
 
+        //Stock validation (kapag less then 0 na, bawal na isubmit!)
+        if (selectedItem.getStock() < quantity) {
+            showAlert(
+                    Alert.AlertType.WARNING,
+                    "Insufficient Stock",
+                    "Not enough stock available for this request."
+            );
+            return;
+        }
+
         try {
             // create transaction object
             String transactionId = transactionsDAO.generateNextTransactionId();
@@ -252,7 +266,7 @@ public class RequestMedicineController implements Initializable {
 
             // Optional: reduce stock in Items collection
             itemsDAO.decreaseStock(selectedItem.getMongoId(), quantity);
-            
+
             NotificationManager.push("New Medicine Request: " + selectedItem.getItemName() + " x " + quantity + "Requested By: " + requestedBy, "Just Now", "INFO");
 
             showAlert(Alert.AlertType.INFORMATION, "Request Sent", "Medicine request submitted successfully!");
@@ -275,7 +289,7 @@ public class RequestMedicineController implements Initializable {
         medicineNameField.clear();
         quantityField.clear();
         requestedByField.clear();
-        requestedFromField.clear();
+        requesterIdField.clear();
         remarksArea.clear();
     }
 
@@ -296,27 +310,33 @@ public class RequestMedicineController implements Initializable {
 
         for (var doc : collection.find()) {
 
-            String status = doc.getString("status");
+            int quantityOnHand = doc.getInteger("quantityOnHand", 0);
+            String expiryDate = doc.getString("expiryDate");
 
             //filter here the status 
-            if (!"Available".equalsIgnoreCase(status)) {
-                continue;
-            }
-
             Items item = new Items(
                     doc.getObjectId("_id").toHexString(),
                     doc.getString("itemId"),
                     doc.getString("name"),
                     doc.get("category", Document.class)
                             .getString("categoryName"),
-                    doc.getInteger("quantityOnHand", 0),
+                    quantityOnHand,
                     doc.getString("unit"),
-                    doc.getString("expiryDate"),
+                    expiryDate,
                     doc.getString("supplier"),
-                    status,
+                    doc.getString("status"),
                     doc.getString("imagePath")
             );
+            if (item.isExpired() | item.isOutOfStock()) {
+                continue;
+            }
             medicines.add(item);
+
+            Label infoLabel = new Label("Stock: " + item.getStock() + " • " + item.getUnit());
+            if (item.isLowStock()) {
+                infoLabel.setText(infoLabel.getText() + " ⚠ Low Stock");
+                infoLabel.setStyle("-fx-text-fill: red; -fx-font-size: 11px;");
+            }
         }
     }
 }

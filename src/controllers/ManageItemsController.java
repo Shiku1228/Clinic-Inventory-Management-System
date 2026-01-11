@@ -122,15 +122,18 @@ public class ManageItemsController implements Initializable {
         colStatus.setCellValueFactory(cellData -> {
             Items item = cellData.getValue();
 
-            String baseStatus = item.getStatus(); // Active / Disabled
-            String condition = item.getInventoryCondition();
-
-            String finalStatus = baseStatus;
-            if (!condition.equals("Normal")) {
-                finalStatus += " • " + condition;
+            // sequence or hierarchal  Expired > Out Of Stock > Low Stock / Normal
+            if (item.isExpired()) {
+                return new javafx.beans.property.SimpleStringProperty("Expired");
+            } else if (item.isOutOfStock()) {
+                return new javafx.beans.property.SimpleStringProperty("Out Of Stock");
+            } else if (item.isLowStock()) {
+                return new javafx.beans.property.SimpleStringProperty("Low Stock");
+            } else if (item.getStatus().equalsIgnoreCase("Active")) {
+                return new javafx.beans.property.SimpleStringProperty("Available");
+            } else {
+                return new javafx.beans.property.SimpleStringProperty(item.getStatus());
             }
-
-            return new javafx.beans.property.SimpleStringProperty(finalStatus);
         });
 
         itemsTable.setFixedCellSize(28);
@@ -170,6 +173,13 @@ public class ManageItemsController implements Initializable {
                     // style in row for low stock items 
                     setStyle(
                             "-fx-background-color: #4B0082;"
+                            + // deep purple (indigo)
+                            "-fx-text-fill: white;"
+                    );
+                } else if (item.isOutOfStock()) {
+                    // style in row for out of stock items 
+                    setStyle(
+                            "-fx-background-color: #0B0C31;"
                             + // deep purple (indigo)
                             "-fx-text-fill: white;"
                     );
@@ -335,6 +345,7 @@ public class ManageItemsController implements Initializable {
             card.getStyleClass().removeAll(
                     "expired-card",
                     "lowstock-card",
+                    "out-of-stock-card",
                     "disabled-card"
             );
             card.setOpacity(1);
@@ -348,6 +359,8 @@ public class ManageItemsController implements Initializable {
                 card.getStyleClass().add("expired-card");
             } else if (item.isLowStock()) {
                 card.getStyleClass().add("lowstock-card");
+            } else if (item.isOutOfStock()) {
+                card.getStyleClass().add("out-of-stock-card");
             }
 
             if (item.isExpired()) {

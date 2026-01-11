@@ -95,6 +95,7 @@ public class Items {
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
+
     //check if item is low stock na
     public boolean isExpired() {
         if (expiryDate == null || expiryDate.isBlank()) {
@@ -103,13 +104,18 @@ public class Items {
 
         try {
             LocalDate exp = LocalDate.parse(expiryDate, DateTimeFormatter.ISO_LOCAL_DATE);
-            return exp.isBefore(LocalDate.now());
+            return !exp.isAfter(LocalDate.now());
         } catch (Exception e) {
             return false; // safe fallback
         }
     }
 
-// Check if low stock
+    // Check if out of stock
+    public boolean isOutOfStock() {
+        return stock == 0;
+    }
+    
+    //for low stock!
     public boolean isLowStock() {
         return stock > 0 && stock <= LOW_STOCK_THRESHOLD;
     }
@@ -121,6 +127,10 @@ public class Items {
         }
         if (isLowStock()) {
             return "Low Stock";
+        }
+        
+        if (isOutOfStock()){
+            return "Out of Stock";
         }
         return "Normal";
     }

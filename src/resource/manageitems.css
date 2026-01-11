@@ -308,6 +308,15 @@
     -fx-text-fill: white;
 }
 
+.out-of-stock-card {
+    -fx-background-color: #0B0C31; /* deepeset blue */
+    -fx-text-fill: white;
+}
+
+.out-of-stock-card .item-name,
+.out-of-stock-card .item-category {
+    -fx-text-fill: white;
+}
 /* Hover effects */
 .gallery-card:hover {
     -fx-scale-x: 1.03;
@@ -318,6 +327,10 @@
 
 .expired-card:hover {
     -fx-background-color: #a60000; /* slightly brighter red */
+}
+
+.out-of-stock-card:hover{
+    -fx-background-color: #000000;
 }
 
 .lowstock-card:hover {

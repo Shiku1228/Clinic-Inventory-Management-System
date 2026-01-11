@@ -64,7 +64,7 @@
                                         <Font name="Impact" size="18" />
                                     </font>
                                 </Label>
-                                <Label styleClass="stat-label" text="Total Medicines" />
+                                <Label styleClass="stat-label" text="Total Items" />
                                 <Label styleClass="stat-sublabel" text="In Stock" />
                             </children>
                             <TilePane.margin>
