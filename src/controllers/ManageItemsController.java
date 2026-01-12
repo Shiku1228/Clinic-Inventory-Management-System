@@ -26,9 +26,11 @@ import models.Items;
 import dao.ItemsDAO;
 import java.io.File;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
+import utils.NotificationManager;
 
 public class ManageItemsController implements Initializable {
 
@@ -242,7 +244,15 @@ public class ManageItemsController implements Initializable {
         exportDataBtn.setOnAction(e
                 -> System.out.println("Export Data clicked"));
         removeExpiredBtn.setOnAction(e
-                -> System.out.println("Remove Expired Items clicked"));
+                -> handleRemoveExpiredItems());
+
+        //restriction for the remove expired items 
+        removeExpiredBtn.disableProperty().bind(
+                Bindings.createBooleanBinding(
+                        () -> itemsData.stream().noneMatch(Items::isExpired),
+                        itemsData
+                )
+        );
 
         //Sample Notifications
         notificationsList.getItems()
@@ -601,6 +611,69 @@ public class ManageItemsController implements Initializable {
                 }
             }
         }
+    }
+
+    private void handleRemoveExpiredItems() {
+
+        //count expired Items first 
+        long expiredCount = itemsData.stream()
+                .filter(Items::isExpired)
+                .count();
+
+        if (expiredCount == 0) {
+            showWarning(
+                    "No expired items.",
+                    "There are no expired items to remove"
+            );
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Remove Expired Items");
+        alert.setHeaderText("Remove all the expired items.");
+        alert.setContentText(
+                "This will permanently delete " + expiredCount + " expired item(s). \nThis action cannot be undone.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        try {
+            ItemsDAO dao = new ItemsDAO();
+            long deleted = dao.deleteExpiredItems();
+
+            if (deleted > 0) {
+                NotificationManager.push(
+                        "Expired items removed on " + LocalDate.now(),
+                        "Admin removed " + deleted + " expired item(s) were permanently deleted",
+                        "WARNING"
+                        
+                );
+            }
+
+            //refreshdata
+            itemsData = dao.getAllItems();
+            itemsTable.setItems(itemsData);
+            itemsTable.refresh();
+
+            refreshGallery();
+            updateSummary();
+
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("Success");
+            success.setHeaderText("Expired Items Removed");
+            success.setContentText(deleted + " expired item(s) were removed.");
+            success.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showWarning(
+                    "Error",
+                    "Failed to remove expired items."
+            );
+        }
+
     }
 
 }

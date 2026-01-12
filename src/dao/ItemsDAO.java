@@ -20,6 +20,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import utils.NotificationManager;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ItemsDAO {
 
@@ -31,26 +32,46 @@ public class ItemsDAO {
     }
 
     public ObservableList<Items> getAllItems() {
-        ObservableList<Items> itemList = FXCollections.observableArrayList();
+        ObservableList<Items> allItems = FXCollections.observableArrayList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
 
         for (Document doc : itemsCollection.find()) {
 
+            String expiryDateStr = doc.getString("expiryDate");
+            String status = doc.getString("status");
+
+            // 🔒 Safe expiry check
+            if (expiryDateStr != null && !expiryDateStr.isBlank()) {
+                LocalDate expiry = LocalDate.parse(expiryDateStr.trim(), formatter);
+
+                if (!expiry.isAfter(today) && !"Expired".equalsIgnoreCase(status)) {
+                    itemsCollection.updateOne(
+                            eq("_id", doc.getObjectId("_id")),
+                            set("status", "Expired")
+                    );
+                    status = "Expired"; // sync local object
+                }
+            }
+
             Items item = new Items(
-                    doc.getObjectId("_id").toHexString(), //MongoID
+                    doc.getObjectId("_id").toHexString(),
                     doc.getString("itemId"),
                     doc.getString("name"),
                     doc.get("category", Document.class).getString("categoryName"),
                     doc.getInteger("quantityOnHand"),
                     doc.getString("unit"),
-                    doc.getString("expiryDate"),
+                    expiryDateStr,
                     doc.getString("supplier"),
-                    doc.getString("status"),
+                    status,
                     doc.getString("imagePath")
             );
 
-            itemList.add(item);
+            allItems.add(item);
         }
-        return itemList;
+
+        return allItems;
     }
 
     public void addItem(Items item) {
@@ -122,7 +143,7 @@ public class ItemsDAO {
                 eq("_id", new ObjectId(item.getMongoId())),
                 set("status", "Available")
         );
-            
+
         NotificationManager.push(
                 "Item enabled: " + item.getItemName(),
                 "Just now",
@@ -152,9 +173,9 @@ public class ItemsDAO {
 
             //notif for the expired items
             LocalDate expiry = LocalDate.parse(item.getExpiryDate());
-            if (expiry.isBefore(LocalDate.now())) {
+            if (!expiry.isAfter(LocalDate.now())) {
                 NotificationManager.push(
-                        "Expired medicine detected: " + item.getItemName(),
+                        "Expired " + item.getCategory().toLowerCase() + " detected: " + item.getItemName(),
                         "Today",
                         "EXPIRED"
                 );
@@ -210,25 +231,42 @@ public class ItemsDAO {
             );
         }
     }
-    
+
     //Total Medicines
-    public long countAllItems(){
+    public long countAllItems() {
         return itemsCollection.countDocuments();
     }
-    
+
     //Low Stock (threshhold = 10)
-    public long countLowStockItems(int threshold){
+    public long countLowStockItems(int threshold) {
         return itemsCollection.countDocuments(
                 Filters.lt("quantityOnHand", threshold)
         );
     }
-    
+
     //Exoired Itenms
-    public long countExpiredItems(){
-        String today = LocalDate.now().toString(    );//yy mm dd
-                                                        
+    public long countExpiredItems() {
+        String today = LocalDate.now().toString();//yy mm dd
+
         return itemsCollection.countDocuments(
-                Filters.lt("expiryDate", today)
+                Filters.and(
+                        Filters.exists("expiryDate", true),
+                        Filters.ne("expiryDate", ""),
+                        Filters.lte("expiryDate", today)
+                )
         );
+    }
+
+    public long deleteExpiredItems() {
+        String today = LocalDate.now().toString();
+
+        return itemsCollection.deleteMany(
+                Filters.and(
+                        Filters.exists("expiryDate", true),
+                        Filters.ne("expiryDate", null),
+                        Filters.ne("expiryDate", ""),
+                        Filters.lte("expiryDate", today)
+                )
+        ).getDeletedCount();
     }
 }
