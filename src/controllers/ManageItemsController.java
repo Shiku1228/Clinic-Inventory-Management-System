@@ -31,6 +31,8 @@ import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import utils.NotificationManager;
+import javafx.stage.FileChooser;
+import utils.ExcelExporter;
 
 public class ManageItemsController implements Initializable {
 
@@ -242,7 +244,8 @@ public class ManageItemsController implements Initializable {
         });
 
         exportDataBtn.setOnAction(e
-                -> System.out.println("Export Data clicked"));
+                -> handleExportExcel());
+
         removeExpiredBtn.setOnAction(e
                 -> handleRemoveExpiredItems());
 
@@ -649,7 +652,6 @@ public class ManageItemsController implements Initializable {
                         "Expired items removed on " + LocalDate.now(),
                         "Admin removed " + deleted + " expired item(s) were permanently deleted",
                         "WARNING"
-                        
                 );
             }
 
@@ -672,6 +674,52 @@ public class ManageItemsController implements Initializable {
                     "Error",
                     "Failed to remove expired items."
             );
+        }
+
+    }
+
+    private void handleExportExcel() {
+
+        if (itemsData == null || itemsData.isEmpty()) {
+            showWarning(
+                    "No Data",
+                    "There are no items to export"
+            );
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Items Report");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Excel File (*.xlsk)", "*.xlsx")
+        );
+        fileChooser.setInitialFileName("Items_Report");
+
+        File file = fileChooser.showSaveDialog(
+                exportDataBtn.getScene().getWindow()
+        );
+
+        if (file == null) {
+            return; //  user cancelled
+        }
+
+        try {
+            //String logoPath = "C:/Users/RENZ S. LATANGGA/Documents/NetBeansProjects/Clinic-Inventory-Management-System-main/src/resource/images_icons/rmmcLogo.png"; // adjust to your logo path
+            ExcelExporter.exportItems(itemsData, file.getAbsolutePath());
+
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("Export Successful");
+            success.setHeaderText(null);
+            success.setContentText(
+                    "Items were successfully export to Excel. \n\n"
+                    + "File: " + file.getName()
+            );
+            success.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            showWarning("Export Failed", "An error occured when doing thee exporting process");
         }
 
     }
