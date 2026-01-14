@@ -20,6 +20,9 @@ import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
 
 import models.Transactions;
+import javafx.stage.FileChooser;
+import java.io.File;
+import utils.ExcelExporter;
 
 public class TransactionsController implements Initializable {
 
@@ -53,6 +56,8 @@ public class TransactionsController implements Initializable {
     private Label lblItemsIssued;
     @FXML
     private Label lblExpiredItems;
+    @FXML
+    private Button exportExcelBtn;
 
     /* =========================
        CONTROLS
@@ -79,7 +84,6 @@ public class TransactionsController implements Initializable {
         //for the database
         database = MongoDBConnection.getDatabase();
         transactionsDAO = new TransactionsDAO(database);
-       
 
         //load the data in card in right way
         // Bind table columns to model
@@ -109,7 +113,7 @@ public class TransactionsController implements Initializable {
         );
         filterCombo.getSelectionModel().selectFirst();
         filterCombo.setOnAction(e -> applyFilter());
-        
+
         applyFilter();
 
         transactionTable.setItems(transactionList);
@@ -139,7 +143,7 @@ public class TransactionsController implements Initializable {
         // TODO: Open Add Transaction modal
     }
 
-     @FXML
+    @FXML
     private void handleRefresh() {
         applyFilter();
     }
@@ -244,7 +248,7 @@ public class TransactionsController implements Initializable {
         );
     }
 
-        private void applyFilter() {
+    private void applyFilter() {
         transactionList.clear();
 
         String filter = filterCombo.getValue();
@@ -278,6 +282,43 @@ public class TransactionsController implements Initializable {
             e.printStackTrace();
             showAlert("Filter Error", "Unable to apply selected filter.");
         }
+
     }
 
+    @FXML
+    private void handleExportTransactions() {
+        if (transactionList.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("No Data");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no transaaction to upload");
+            alert.showAndWait();
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Transaaction Reports");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx")
+        );
+        fileChooser.setInitialFileName("Transaction_Report");
+
+        File file = fileChooser.showSaveDialog(
+                transactionTable.getScene().getWindow()
+        );
+
+        if (file == null) {
+            return;
+        }
+
+        ExcelExporter.exportTransactions(
+                transactionList, file.getAbsolutePath()
+        );
+
+        Alert success = new Alert(Alert.AlertType.INFORMATION);
+        success.setTitle("Export Successful");
+        success.setHeaderText(null);
+        success.setContentText("Transactions were exported successfully.");
+        success.showAndWait();
+    }
 }
