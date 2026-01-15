@@ -32,6 +32,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import utils.NotificationManager;
 import javafx.stage.FileChooser;
+import models.Notifications;
 import utils.ExcelExporter;
 
 public class ManageItemsController implements Initializable {
@@ -98,7 +99,7 @@ public class ManageItemsController implements Initializable {
 
     //Notifications
     @FXML
-    private ListView<String> notificationsList;
+    private ListView<Notifications> notificationsList;
 
     //Sample Data
     private ObservableList<Items> itemsData = FXCollections.observableArrayList();
@@ -257,15 +258,40 @@ public class ManageItemsController implements Initializable {
                 )
         );
 
-        //Sample Notifications
-        notificationsList.getItems()
-                .addAll(
-                        "Paracetamol stock is low",
-                        "Syringe expiring soon",
-                        "Stethoscope stock is low"
+        //For the notifications
+        notificationsList.setItems(NotificationManager.getFeed());
+
+        notificationsList.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Notifications item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                setText(
+                        "[" + item.getType() + "] "
+                        + item.getMessage()
+                        + " • "
+                        + item.getTimeText()
                 );
-        // Remove blank or empty notifications
-        notificationsList.getItems().removeIf(item -> item == null || item.trim().isEmpty());
+
+                // optional styling
+                getStyleClass().removeAll("notif-success", "notif-warning", "notif-error");
+
+                switch (item.getType()) {
+                    case "SUCCESS" ->
+                        getStyleClass().add("notif-success");
+                    case "WARNING" ->
+                        getStyleClass().add("notif-warning");
+                    case "ERROR" ->
+                        getStyleClass().add("notif-error");
+                }
+            }
+        });
 
         //Update Header Summary
         updateSummary();
