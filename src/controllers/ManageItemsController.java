@@ -302,6 +302,15 @@ public class ManageItemsController implements Initializable {
         totalEquipmentsCard.setOnMouseClicked(e -> handleSummaryClick("Equipment"));
         lowStocksCard.setOnMouseClicked(e -> handleSummaryClick("LowStock"));
 
+        ItemsDAO dao = new ItemsDAO();
+        dao.generateItemNotifications(); // generate stock/expiry notifications
+
+        NotificationManager.getFeed().addListener((javafx.collections.ListChangeListener.Change<? extends Notifications> c) -> {
+            // do something if needed, e.g., update badge count
+            lowStocksLabel.setText(String.valueOf(
+                    NotificationManager.getFeed().stream().filter(n -> n.getType().equals("LOW_STOCK")).count()
+            ));
+        });
     }
 
     private void filterItems() {
@@ -466,6 +475,12 @@ public class ManageItemsController implements Initializable {
             itemsTable.setItems(itemsData);
             refreshGallery();
 
+            NotificationManager.push(
+                    "Stock updated: " + item.getItemName(),
+                    "Admin updated the stock of this item",
+                    "SUCCESS"
+            );
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -493,6 +508,11 @@ public class ManageItemsController implements Initializable {
                 //remove from the gallery 
                 galleryPane.getChildren().remove(itemCard);
 
+                NotificationManager.push(
+                        "Item removed: " + item.getItemName(),
+                        "Admin deleted the item",
+                        "WARNING"
+                );
                 System.out.println("Removed Successfully");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -541,6 +561,12 @@ public class ManageItemsController implements Initializable {
                 itemsTable.refresh();
                 refreshGallery();
 
+                NotificationManager.push(
+                        "Item disabled: " + item.getItemName(),
+                        "Admin disabled this item",
+                        "WARNING"
+                );
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -583,6 +609,12 @@ public class ManageItemsController implements Initializable {
             dialogStage.setResizable(false);
 
             dialogStage.showAndWait();
+
+            NotificationManager.push(
+                    "New item added successfully",
+                    "Admin added a new item",
+                    "SUCCESS"
+            );
 
         } catch (Exception e) {
             e.printStackTrace();

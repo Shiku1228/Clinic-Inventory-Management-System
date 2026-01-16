@@ -20,6 +20,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import utils.NotificationManager;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class ItemsDAO {
@@ -268,5 +269,61 @@ public class ItemsDAO {
                         Filters.lte("expiryDate", today)
                 )
         ).getDeletedCount();
+    }
+
+    public void generateItemNotifications() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+        String nowTime = LocalTime.now().withNano(0).toString();
+
+        for (Document doc : itemsCollection.find()) {
+            String name = doc.getString("name");
+            String category = doc.get("category", Document.class).getString("categoryName");
+            int stock = doc.getInteger("quantityOnHand");
+            String expiryStr = doc.getString("expiryDate");
+
+            // Expired
+            if (expiryStr != null && !expiryStr.isBlank()) {
+                LocalDate expiry = LocalDate.parse(expiryStr.trim(), formatter);
+                if (!expiry.isAfter(today)) {
+                    // avoid duplicate
+                    boolean exists = NotificationManager.getFeed().stream()
+                            .anyMatch(n -> n.getMessage().contains(name) && n.getType().equals("EXPIRED"));
+                    if (!exists) {
+                        NotificationManager.push(
+                                "Expired " + category.toLowerCase() + ": " + name,
+                                "Today",
+                                "EXPIRED"
+                        );
+                    }
+                }
+            }
+
+            // Out of stock
+            if (stock == 0) {
+                boolean exists = NotificationManager.getFeed().stream()
+                        .anyMatch(n -> n.getMessage().contains(name) && n.getType().equals("OUT_OF_STOCK"));
+                if (!exists) {
+                    NotificationManager.push(
+                            "Out of stock: " + name,
+                            nowTime,
+                            "OUT_OF_STOCK"
+                    );
+                }
+            }
+
+            // Low stock
+            if (stock > 0 && stock <= 10) { // threshold = 10
+                boolean exists = NotificationManager.getFeed().stream()
+                        .anyMatch(n -> n.getMessage().contains(name) && n.getType().equals("LOW_STOCK"));
+                if (!exists) {
+                    NotificationManager.push(
+                            "Low stock alert: " + name + " (" + stock + " left)",
+                            nowTime,
+                            "LOW_STOCK"
+                    );
+                }
+            }
+        }
     }
 }
