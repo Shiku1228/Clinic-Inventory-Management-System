@@ -259,9 +259,9 @@ public class ManageItemsController implements Initializable {
         );
 
         //For the notifications
-        notificationsList.setItems(NotificationManager.getFeed());
+        //notificationsList.setItems(NotificationManager.getFeed());
 
-        notificationsList.setCellFactory(list -> new ListCell<>() {
+        /*notificationsList.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Notifications item, boolean empty) {
                 super.updateItem(item, empty);
@@ -292,6 +292,7 @@ public class ManageItemsController implements Initializable {
                 }
             }
         });
+*/
 
         //Update Header Summary
         updateSummary();

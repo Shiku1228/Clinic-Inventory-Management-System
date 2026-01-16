@@ -146,7 +146,7 @@
                     <Button fx:id="removeExpiredBtn" text="Remove Expired" />
                 </HBox>
 
-                <!-- Notifications -->
+                <!-- Notifications 
                 <VBox spacing="10">
                     <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #141652;" text="Notifications:" />
                     <ScrollPane fitToWidth="true" prefHeight="200" style="-fx-background-color: transparent;">
@@ -154,7 +154,7 @@
                             <ListView fx:id="notificationsList" focusTraversable="false" styleClass="notifications-list" />
                         </content>
                     </ScrollPane>
-                </VBox>
+                </VBox>-->
             </VBox>
 
         </content>
