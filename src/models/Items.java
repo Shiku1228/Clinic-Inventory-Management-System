@@ -114,7 +114,7 @@ public class Items {
     public boolean isOutOfStock() {
         return stock == 0;
     }
-    
+
     //for low stock!
     public boolean isLowStock() {
         return stock > 0 && stock <= LOW_STOCK_THRESHOLD;
@@ -125,13 +125,30 @@ public class Items {
         if (isExpired()) {
             return "Expired";
         }
-        if (isLowStock()) {
+        if (isLowStockByCategory()) {
             return "Low Stock";
         }
-        
-        if (isOutOfStock()){
+
+        if (isOutOfStock()) {
             return "Out of Stock";
         }
         return "Normal";
+    }
+
+    //low stock notification. filtered na by status
+    public boolean isLowStockByCategory() {
+        if (category == null) {
+            return false;
+        }
+
+        if (category.equalsIgnoreCase("Equipment")) {
+            return stock > 0 && stock <= 3;  
+        }
+
+        if (category.equalsIgnoreCase("Medicine") || category.equalsIgnoreCase("Supplies")) {
+            return stock > 0 && stock <= LOW_STOCK_THRESHOLD; // default 10
+        }
+        
+        return false;
     }
 }

@@ -312,10 +312,20 @@ public class ItemsDAO {
                 }
             }
 
-            // Low stock
-            if (stock > 0 && stock <= 10) { // threshold = 10
+            // for the low stock
+            // Low stock by category
+            boolean isLow = false;
+
+            if (category.equalsIgnoreCase("Equipment")) {
+                isLow = stock > 0 && stock <= 3;   // ⚙ equipment critical only
+            } else if (category.equalsIgnoreCase("Medicine") || category.equalsIgnoreCase("Supply")) {
+                isLow = stock > 0 && stock <= 10;  // 💊 normal low stock
+            }
+
+            if (isLow) {
                 boolean exists = NotificationManager.getFeed().stream()
                         .anyMatch(n -> n.getMessage().contains(name) && n.getType().equals("LOW_STOCK"));
+
                 if (!exists) {
                     NotificationManager.push(
                             "Low stock alert: " + name + " (" + stock + " left)",
