@@ -132,20 +132,25 @@ public class ManageItemsController implements Initializable {
                 return new javafx.beans.property.SimpleStringProperty("Expired");
             } else if (item.isOutOfStock()) {
                 return new javafx.beans.property.SimpleStringProperty("Out Of Stock");
-            } else if (item.isLowStock()) {
+            } else if ((item.getCategory().equalsIgnoreCase("Equipment") && item.getStock() <= 3)
+                    || ((item.getCategory().equalsIgnoreCase("Medicine") || item.getCategory().equalsIgnoreCase("Supplies"))
+                    && item.getStock() <= 10)) {
                 return new javafx.beans.property.SimpleStringProperty("Low Stock");
             } else if (item.getStatus().equalsIgnoreCase("Active")) {
                 return new javafx.beans.property.SimpleStringProperty("Available");
             } else {
                 return new javafx.beans.property.SimpleStringProperty(item.getStatus());
             }
-        });
-
-        itemsTable.setFixedCellSize(28);
-        itemsTable.prefHeightProperty().bind(
-                itemsTable.fixedCellSizeProperty()
-                        .multiply(Bindings.size(itemsTable.getItems()).add(1.2))
+        }
         );
+
+        itemsTable.setFixedCellSize(
+                28);
+        itemsTable.prefHeightProperty()
+                .bind(
+                        itemsTable.fixedCellSizeProperty()
+                                .multiply(Bindings.size(itemsTable.getItems()).add(1.2))
+                );
         // Get default row height
         itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         itemsTable.setPlaceholder(new Label("No items available"));
@@ -174,7 +179,9 @@ public class ManageItemsController implements Initializable {
                             + // deep red
                             "-fx-text-fill: white;"
                     );
-                } else if (item.isLowStock()) {
+                } else if ((item.getCategory().equalsIgnoreCase("Equipment") && item.getStock() <= 3)
+                        || ((item.getCategory().equalsIgnoreCase("Medicine") || item.getCategory().equalsIgnoreCase("Supplies"))
+                        && item.getStock() <= 10)) {
                     // style in row for low stock items 
                     setStyle(
                             "-fx-background-color: #4B0082;"
@@ -292,8 +299,7 @@ public class ManageItemsController implements Initializable {
                 }
             }
         });
-*/
-
+         */
         //Update Header Summary
         updateSummary();
 
@@ -406,7 +412,9 @@ public class ManageItemsController implements Initializable {
 
             if (item.isExpired()) {
                 card.getStyleClass().add("expired-card");
-            } else if (item.isLowStock()) {
+            } else if ((item.getCategory().equalsIgnoreCase("Equipment") && item.getStock() <= 3)
+                    || ((item.getCategory().equalsIgnoreCase("Medicine") || item.getCategory().equalsIgnoreCase("Supplies"))
+                    && item.getStock() <= 10)) {
                 card.getStyleClass().add("lowstock-card");
             } else if (item.isOutOfStock()) {
                 card.getStyleClass().add("out-of-stock-card");
@@ -438,7 +446,12 @@ public class ManageItemsController implements Initializable {
         int totalSupplies = (int) itemsData.stream().filter(i -> i.getCategory().equalsIgnoreCase("Supplies")).count();
         int totalEquipments = (int) itemsData.stream().filter(i -> i.getCategory().equalsIgnoreCase("Equipment")).count();
         int lowStocks = (int) itemsData.stream()
-                .filter(i -> i.isLowStock() && !i.isExpired())
+                .filter(i
+                        -> (i.getCategory().equalsIgnoreCase("Equipment") && i.getStock() <= 3)
+                || ((i.getCategory().equalsIgnoreCase("Medicine") || i.getCategory().equalsIgnoreCase("Supplies"))
+                && i.getStock() <= 10)
+                )
+                .filter(i -> !i.isExpired())
                 .count();
 
         totalMedicinesLabel.setText(String.valueOf(totalMedicines));

@@ -238,12 +238,27 @@ public class ItemsDAO {
         return itemsCollection.countDocuments();
     }
 
-    //Low Stock (threshhold = 10)
-    public long countLowStockItems(int threshold) {
-        return itemsCollection.countDocuments(
-                Filters.lt("quantityOnHand", threshold)
-        );
-    }
+    //count low stock
+    public long countLowStockItems() {
+
+    return itemsCollection.countDocuments(
+            Filters.or(
+
+                    // Medicines & Supplies → threshold = 10
+                    Filters.and(
+                            Filters.in("category.categoryName", "Medicine", "Supplies"),
+                            Filters.lte("quantityOnHand", 10)
+                    ),
+
+                    // Equipment → threshold = 3
+                    Filters.and(
+                            Filters.eq("category.categoryName", "Equipment"),
+                            Filters.lte("quantityOnHand", 3)
+                    )
+            )
+    );
+}
+
 
     //Exoired Itenms
     public long countExpiredItems() {

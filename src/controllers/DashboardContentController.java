@@ -144,7 +144,7 @@ public class DashboardContentController {
         );
 
         lowSupplyLabel.setText(
-                String.valueOf(itemsDAO.countLowStockItems(10))
+                String.valueOf(itemsDAO.countLowStockItems())
         );
 
         totalUsersLabel.setText(
