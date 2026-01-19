@@ -304,10 +304,10 @@ public class ManageItemsController implements Initializable {
         updateSummary();
 
         // Make summary cards clickable
-        totalMedicinesCard.setOnMouseClicked(e -> handleSummaryClick("Medicine"));
-        totalSuppliesCard.setOnMouseClicked(e -> handleSummaryClick("Supplies"));
-        totalEquipmentsCard.setOnMouseClicked(e -> handleSummaryClick("Equipment"));
-        lowStocksCard.setOnMouseClicked(e -> handleSummaryClick("LowStock"));
+        totalMedicinesCard.setOnMouseClicked(e -> filterByCategory("Medicine"));
+        totalSuppliesCard.setOnMouseClicked(e -> filterByCategory("Supplies"));
+        totalEquipmentsCard.setOnMouseClicked(e -> filterByCategory("Equipment"));
+        lowStocksCard.setOnMouseClicked(e -> filterByCategory("LowStock"));
 
         ItemsDAO dao = new ItemsDAO();
         dao.generateItemNotifications(); // generate stock/expiry notifications
@@ -794,6 +794,41 @@ public class ManageItemsController implements Initializable {
             showWarning("Export Failed", "An error occured when doing thee exporting process");
         }
 
+    }
+
+    private void filterByCategory(String category) {
+
+        ObservableList<Items> filtered = FXCollections.observableArrayList();
+
+        switch (category) {
+
+            case "Medicine" ->
+                filtered = itemsData.filtered(i -> i.getCategory().equalsIgnoreCase("Medicine"));
+
+            case "Supplies" ->
+                filtered = itemsData.filtered(i -> i.getCategory().equalsIgnoreCase("Supplies"));
+
+            case "Equipment" ->
+                filtered = itemsData.filtered(i -> i.getCategory().equalsIgnoreCase("Equipment"));
+
+            case "LowStock" ->
+                filtered = itemsData.filtered(i
+                        -> !i.isExpired()
+                        && ((i.getCategory().equalsIgnoreCase("Equipment") && i.getStock() <= 3)
+                        || ((i.getCategory().equalsIgnoreCase("Medicine") || i.getCategory().equalsIgnoreCase("Supplies"))
+                        && i.getStock() <= 10))
+                );
+
+            default ->
+                itemsTable.setItems(itemsData);
+        }
+
+        itemsTable.setItems(filtered);
+    }
+
+    @FXML
+    private void showAllItems() {
+        itemsTable.setItems(itemsData);
     }
 
 }
