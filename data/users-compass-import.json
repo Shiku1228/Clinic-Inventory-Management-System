@@ -1,0 +1,42 @@
+[
+  {
+    "userId": "USR_001",
+    "username": "admin",
+    "role": "Director",
+    "contact": "0000000000",
+    "email": "admin@example.com",
+    "status": "Active",
+    "avatar": "/resource/avatars/user.png",
+    "password": "admin123"
+  },
+  {
+    "userId": "USR_002",
+    "username": "doctor1",
+    "role": "Doctor",
+    "contact": "0000000001",
+    "email": "doctor1@example.com",
+    "status": "Active",
+    "avatar": "/resource/avatars/user.png",
+    "password": "doctor123"
+  },
+  {
+    "userId": "USR_003",
+    "username": "nurse1",
+    "role": "Nurse",
+    "contact": "0000000002",
+    "email": "nurse1@example.com",
+    "status": "Active",
+    "avatar": "/resource/avatars/user.png",
+    "password": "nurse123"
+  },
+  {
+    "userId": "USR_004",
+    "username": "admin2",
+    "role": "Admin",
+    "contact": "0000000003",
+    "email": "admin2@example.com",
+    "status": "Active",
+    "avatar": "/resource/avatars/user.png",
+    "password": "admin123"
+  }
+]

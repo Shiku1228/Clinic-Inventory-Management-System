@@ -1,6 +1,5 @@
 package controllers;
 
-import com.mongodb.client.MongoDatabase;
 import dao.UsersDAO;
 import database.MongoDBConnection;
 import java.net.URL;
@@ -44,10 +43,6 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         errorLabel.setText("");
-
-        // initialize DAO
-        MongoDatabase db = MongoDBConnection.getDatabase(); // your DB connection
-        userDAO = new UsersDAO(db);
     }
 
     @FXML
@@ -57,6 +52,11 @@ public class LoginController implements Initializable {
 
         if (username.isEmpty() || password.isEmpty()) {
             errorLabel.setText("Username and password is required.");
+            return;
+        }
+
+        if (!ensureUserDao()) {
+            errorLabel.setText("Database is unavailable right now.");
             return;
         }
 
@@ -113,6 +113,20 @@ public class LoginController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             errorLabel.setText("Failed to load dashboard");
+        }
+    }
+
+    private boolean ensureUserDao() {
+        if (userDAO != null) {
+            return true;
+        }
+
+        try {
+            userDAO = new UsersDAO(MongoDBConnection.getDatabase());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

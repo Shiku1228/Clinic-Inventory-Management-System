@@ -3,6 +3,7 @@ package dao;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -30,15 +31,7 @@ public class UsersDAO {
     // insert a new user
     public boolean insertUser(Users user) {
         try {
-            Document doc = new Document("_id", new ObjectId())
-                    .append("userId", user.getUserId())
-                    .append("username", user.getName())
-                    .append("role", user.getRole())
-                    .append("contact", user.getContact())
-                    .append("email", user.getEmail())
-                    .append("status", user.getStatus())
-                    .append("avatar", user.getAvatarPath())
-                    .append("password", user.getPassword());
+            Document doc = buildUserDocument(user, true);
 
             usersCollection.insertOne(doc);
 
@@ -49,6 +42,21 @@ public class UsersDAO {
                     "INFO"
             );
 
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean upsertUser(Users user) {
+        try {
+            Document doc = buildUserDocument(user, false);
+            usersCollection.replaceOne(
+                    Filters.eq("userId", user.getUserId()),
+                    doc,
+                    new ReplaceOptions().upsert(true)
+            );
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,5 +240,25 @@ public class UsersDAO {
     
     public long countUsers(){ 
         return usersCollection.countDocuments();
+    }
+
+    private Document buildUserDocument(Users user, boolean createNewId) {
+        Document doc = new Document()
+                .append("userId", user.getUserId())
+                .append("username", user.getName())
+                .append("role", user.getRole())
+                .append("contact", user.getContact())
+                .append("email", user.getEmail())
+                .append("status", user.getStatus())
+                .append("avatar", user.getAvatarPath())
+                .append("password", user.getPassword());
+
+        if (createNewId || user.getMongoId() == null) {
+            doc.put("_id", new ObjectId());
+        } else {
+            doc.put("_id", user.getMongoId());
+        }
+
+        return doc;
     }
 }
